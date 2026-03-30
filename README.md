@@ -7,8 +7,6 @@
 | File | Description |
 |------|-------------|
 | [`dva-c02-study-guide.html`](dva-c02-study-guide.html) | Core concepts reference — all exam topics with key facts, tables, and gotchas |
-| [`dva-c02-labs.html`](dva-c02-labs.html) | 25 hands-on labs with CLI commands and code (Python/general) |
-| [`dva-c02-visual-labs.html`](dva-c02-visual-labs.html) | 12 visual labs with SVG architecture diagrams and AWS Console mockups |
 | [`dva-c02-java-labs.html`](dva-c02-java-labs.html) | 18 Java & Spring Boot labs — AWS SDK v2, all major services in Java |
 | [`dva-c02-supplemental-labs.html`](dva-c02-supplemental-labs.html) | 12 gap-coverage labs with step-by-step AWS Console UI walkthroughs |
 
@@ -101,7 +99,7 @@
 
 ---
 
-## ☕ Java & Spring Boot Labs
+## ☕ Java & Spring Boot Labs — `dva-c02-java-labs.html`
 
 18 labs covering every DVA-C02 domain using **Java 17+**, **AWS SDK v2**, **Spring Boot 3.x**, and **Spring Cloud AWS**. Each lab contains runnable code, Maven dependencies, and exam insights.
 

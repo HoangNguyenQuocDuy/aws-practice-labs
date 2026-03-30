@@ -1,0 +1,1161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS DVA-C02 Study Guide</title>
+    <style>
+        :root {
+            --bg: #0f1117; --surface: #1a1d27; --card: #21253a;
+            --accent: #ff9900; --accent2: #00c7b7; --accent3: #7c6af7;
+            --text: #e8eaf0; --muted: #8b92a8; --border: #2e3350;
+            --green: #2ecc71; --red: #e74c3c; --yellow: #f39c12; --blue: #3498db;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; font-size: 14px; line-height: 1.6; }
+        a { color: var(--accent); text-decoration: none; }
+
+        /* NAV */
+        nav { position: fixed; top: 0; left: 0; width: 240px; height: 100vh; background: var(--surface); border-right: 1px solid var(--border); overflow-y: auto; padding: 16px 0; z-index: 100; }
+        nav h2 { color: var(--accent); font-size: 13px; text-transform: uppercase; letter-spacing: 1px; padding: 8px 16px 4px; }
+        nav a { display: block; padding: 6px 16px; color: var(--muted); font-size: 13px; border-left: 3px solid transparent; transition: all .2s; }
+        nav a:hover, nav a.active { color: var(--text); border-left-color: var(--accent); background: rgba(255,153,0,.07); }
+        nav .section-label { font-size: 11px; color: var(--accent3); text-transform: uppercase; letter-spacing: 1px; padding: 12px 16px 2px; font-weight: 700; }
+
+        /* MAIN */
+        main { margin-left: 240px; padding: 32px 40px; max-width: 1100px; }
+        .hero { background: linear-gradient(135deg, #1a1d27 0%, #21253a 100%); border: 1px solid var(--border); border-radius: 12px; padding: 32px; margin-bottom: 32px; }
+        .hero h1 { font-size: 28px; color: var(--accent); margin-bottom: 8px; }
+        .hero p { color: var(--muted); font-size: 15px; }
+        .badge { display: inline-block; background: var(--accent); color: #000; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 20px; margin-left: 8px; vertical-align: middle; }
+        .badge.blue { background: var(--blue); color: #fff; }
+        .badge.green { background: var(--green); color: #fff; }
+        .badge.red { background: var(--red); color: #fff; }
+        .badge.purple { background: var(--accent3); color: #fff; }
+
+        /* SECTIONS */
+        section { margin-bottom: 40px; }
+        h2.section-title { font-size: 20px; color: var(--accent); border-bottom: 2px solid var(--accent); padding-bottom: 8px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        h3 { font-size: 15px; color: var(--accent2); margin: 18px 0 8px; }
+        h4 { font-size: 13px; color: var(--yellow); margin: 12px 0 6px; }
+
+        /* CARDS */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin-bottom: 16px; }
+        .card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
+        .card h3 { margin-top: 0; }
+
+        /* TABLES */
+        table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 13px; }
+        th { background: var(--surface); color: var(--accent); text-align: left; padding: 8px 12px; border: 1px solid var(--border); }
+        td { padding: 7px 12px; border: 1px solid var(--border); vertical-align: top; }
+        tr:nth-child(even) td { background: rgba(255,255,255,.02); }
+
+        /* CODE */
+        code { background: #0d1117; color: #79c0ff; padding: 2px 6px; border-radius: 4px; font-family: 'Consolas', monospace; font-size: 12px; }
+        pre { background: #0d1117; border: 1px solid var(--border); border-radius: 6px; padding: 14px; overflow-x: auto; margin: 10px 0; }
+        pre code { background: none; padding: 0; color: #e6edf3; font-size: 12px; }
+
+        /* TIPS */
+        .tip { background: rgba(255,153,0,.08); border-left: 4px solid var(--accent); padding: 10px 14px; border-radius: 0 6px 6px 0; margin: 10px 0; }
+        .tip.blue { background: rgba(52,152,219,.08); border-left-color: var(--blue); }
+        .tip.green { background: rgba(46,204,113,.08); border-left-color: var(--green); }
+        .tip.red { background: rgba(231,76,60,.08); border-left-color: var(--red); }
+        .tip.purple { background: rgba(124,106,247,.08); border-left-color: var(--accent3); }
+        .tip strong { color: var(--accent); }
+        .tip.blue strong { color: var(--blue); }
+        .tip.green strong { color: var(--green); }
+        .tip.red strong { color: var(--red); }
+        .tip.purple strong { color: var(--accent3); }
+
+        ul, ol { padding-left: 20px; }
+        li { margin: 3px 0; }
+        p { margin: 6px 0; }
+
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        @media (max-width: 900px) { nav { display: none; } main { margin-left: 0; padding: 16px; } .two-col { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+<nav>
+    <h2>DVA-C02</h2>
+    <div class="section-label">Fundamentals</div>
+    <a href="#iam">IAM</a>
+    <a href="#ec2">EC2</a>
+    <a href="#ebs">EBS</a>
+    <a href="#elb">ELB / ASG</a>
+    <a href="#rds">RDS / Aurora</a>
+    <a href="#elasticache">ElastiCache</a>
+    <a href="#s3">S3</a>
+    <a href="#vpc">VPC / SG</a>
+    <div class="section-label">Developer Tools</div>
+    <a href="#cli-sdk">CLI &amp; SDK</a>
+    <a href="#cicd">CI/CD Overview</a>
+    <a href="#codecommit">CodeCommit</a>
+    <a href="#codebuild">CodeBuild</a>
+    <a href="#codedeploy">CodeDeploy</a>
+    <a href="#codepipeline">CodePipeline</a>
+    <div class="section-label">Serverless</div>
+    <a href="#lambda">Lambda</a>
+    <a href="#dynamodb">DynamoDB</a>
+    <a href="#apigateway">API Gateway</a>
+    <a href="#cognito">Cognito</a>
+    <a href="#stepfunctions">Step Functions</a>
+    <a href="#sam">SAM</a>
+    <a href="#appsync">AppSync</a>
+    <div class="section-label">Containers</div>
+    <a href="#ecs">ECS</a>
+    <a href="#ecr">ECR</a>
+    <a href="#fargate">Fargate</a>
+    <div class="section-label">Messaging</div>
+    <a href="#sqs">SQS</a>
+    <a href="#sns">SNS</a>
+    <a href="#kinesis">Kinesis</a>
+    <div class="section-label">Monitoring</div>
+    <a href="#cloudwatch">CloudWatch</a>
+    <a href="#xray">X-Ray</a>
+    <a href="#cloudtrail">CloudTrail</a>
+    <a href="#config">Config</a>
+    <div class="section-label">Infra as Code</div>
+    <a href="#cloudformation">CloudFormation</a>
+    <a href="#beanstalk">Elastic Beanstalk</a>
+    <div class="section-label">Security</div>
+    <a href="#kms">KMS</a>
+    <a href="#secrets">Secrets Manager</a>
+    <a href="#cloudfront">CloudFront</a>
+</nav>
+
+<main>
+    <div class="hero">
+        <h1>AWS DVA-C02 Study Guide</h1>
+        <p>Comprehensive exam prep — key concepts, gotchas, and exam tips for the AWS Certified Developer Associate exam.</p>
+    </div>
+
+    <!-- ===== IAM ===== -->
+    <section id="iam">
+        <h2 class="section-title">🔐 IAM — Identity &amp; Access Management</h2>
+        <div class="grid">
+            <div class="card">
+                <h3>Core Concepts</h3>
+                <ul>
+                    <li><strong>Users</strong> — physical person, one per human</li>
+                    <li><strong>Groups</strong> — collection of users (no nesting)</li>
+                    <li><strong>Roles</strong> — for AWS services / cross-account</li>
+                    <li><strong>Policies</strong> — JSON docs defining Allow/Deny</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>Policy Types</h3>
+                <ul>
+                    <li><strong>Identity-based</strong> — attached to user/group/role</li>
+                    <li><strong>Resource-based</strong> — attached to resource (S3, etc.)</li>
+                    <li><strong>Permissions Boundary</strong> — max permissions cap</li>
+                    <li><strong>SCP (Org)</strong> — max permissions for entire account</li>
+                    <li><strong>Session Policies</strong> — limit assumed role session</li>
+                    <li><strong>ACLs</strong> — cross-account, no JSON structure</li>
+                </ul>
+            </div>
+        </div>
+        <div class="tip red"><strong>Never</strong> use root account except for initial setup. Never store credentials in code.</div>
+        <div class="tip"><strong>Exam tip:</strong> <code>--dry-run</code> CLI flag tests permissions without executing. STS <code>decode-authorization-message</code> decodes encoded error messages.</div>
+        <h3>IAM Federation</h3>
+        <p>Large enterprises can use SAML 2.0 to integrate their own identity provider (Active Directory, etc.) with IAM. Users authenticate via their corporate IdP and get temporary AWS credentials via STS.</p>
+        <h3>STS — Security Token Service</h3>
+        <ul>
+            <li><code>AssumeRole</code> — assume a role in same or another account</li>
+            <li><code>AssumeRoleWithWebIdentity</code> — for web identity federation (Cognito preferred)</li>
+            <li><code>AssumeRoleWithSAML</code> — for SAML federation</li>
+            <li><code>GetSessionToken</code> — for MFA</li>
+        </ul>
+    </section>
+
+    <!-- ===== EC2 ===== -->
+    <section id="ec2">
+        <h2 class="section-title">💻 EC2 — Elastic Compute Cloud</h2>
+        <div class="grid">
+            <div class="card">
+                <h3>Instance Types</h3>
+                <ul>
+                    <li><strong>On-Demand</strong> — pay per second, no commitment</li>
+                    <li><strong>Reserved (1 or 3 yr)</strong> — up to 75% cheaper</li>
+                    <li><strong>Spot</strong> — up to 90% cheaper, can be reclaimed (2-min warning)</li>
+                    <li><strong>Dedicated Host</strong> — full physical server, BYOL</li>
+                    <li><strong>Dedicated Instance</strong> — hardware dedicated to you</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>Key Features</h3>
+                <ul>
+                    <li><strong>User Data</strong> — bootstrap script, runs once at first start as root</li>
+                    <li><strong>Metadata</strong> — <code>http://169.254.169.254/latest/meta-data</code> (inside instance only)</li>
+                    <li><strong>AMI</strong> — region-specific custom images</li>
+                    <li><strong>T2/T3 Burstable</strong> — uses CPU credits; T2 Unlimited = pay for extra bursts</li>
+                </ul>
+            </div>
+        </div>
+        <div class="tip blue"><strong>Exam:</strong> EC2 metadata URL returns IAM role name but NOT the IAM policy. Memory metrics require CloudWatch Agent (not default).</div>
+    </section>
+
+    <!-- ===== EBS ===== -->
+    <section id="ebs">
+        <h2 class="section-title">💾 EBS — Elastic Block Store</h2>
+        <table>
+            <tr><th>Type</th><th>Use Case</th><th>Boot?</th></tr>
+            <tr><td>gp2/gp3 (SSD)</td><td>General purpose, most workloads, dev/test</td><td>✅</td></tr>
+            <tr><td>io1/io2 (SSD)</td><td>High IOPS, critical DBs (MongoDB, SQL)</td><td>✅</td></tr>
+            <tr><td>st1 (HDD)</td><td>Big data, log processing, throughput-intensive</td><td>❌</td></tr>
+            <tr><td>sc1 (HDD)</td><td>Cold data, lowest cost, infrequent access</td><td>❌</td></tr>
+        </table>
+        <div class="tip red"><strong>Key facts:</strong> EBS is locked to an AZ. Attach to only ONE instance at a time (except io1/io2 Multi-Attach). Snapshots are needed to move across AZs. Encryption uses KMS (AES-256).</div>
+        <h3>Encryption</h3>
+        <p>To encrypt an unencrypted volume: snapshot → copy snapshot with encryption enabled → restore from encrypted snapshot → migrate app → delete old DB.</p>
+    </section>
+
+    <!-- ===== ELB / ASG ===== -->
+    <section id="elb">
+        <h2 class="section-title">⚖️ ELB &amp; ASG</h2>
+        <div class="grid">
+            <div class="card">
+                <h3>Load Balancer Types</h3>
+                <ul>
+                    <li><strong>ALB (Layer 7)</strong> — HTTP/HTTPS, path/host routing, WebSocket, containers. Client IP in <code>X-Forwarded-For</code></li>
+                    <li><strong>NLB (Layer 4)</strong> — TCP/UDP, millions req/s, static IP, ~100ms latency. Sees client IP directly</li>
+                    <li><strong>CLB (Legacy)</strong> — avoid for new apps</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>ASG Key Points</h3>
+                <ul>
+                    <li>Scale out/in based on CloudWatch alarms or custom metrics</li>
+                    <li>Launch Configuration / Launch Template defines instance config</li>
+                    <li>IAM roles on ASG are assigned to all EC2 instances</li>
+                    <li>ASG is free — pay for underlying EC2s</li>
+                    <li>ASG replaces unhealthy instances automatically</li>
+                </ul>
+            </div>
+        </div>
+        <div class="tip"><strong>503</strong> = LB at capacity or no registered targets. <strong>504</strong> = gateway timeout (backend issue).</div>
+    </section>
+
+    <!-- ===== RDS ===== -->
+    <section id="rds">
+        <h2 class="section-title">🗄️ RDS &amp; Aurora</h2>
+        <div class="two-col">
+            <div>
+                <h3>RDS Features</h3>
+                <ul>
+                    <li>Managed: patching, backups, monitoring</li>
+                    <li>Read Replicas — async replication, up to 15 (MySQL/Postgres/MariaDB), 5 (Oracle/SQL Server)</li>
+                    <li>Multi-AZ — sync replication, automatic failover, same DNS</li>
+                    <li>Backups: automated (7-35 days) + manual snapshots</li>
+                    <li>Encryption at rest: KMS AES-256</li>
+                    <li>Cannot SSH into RDS instances</li>
+                </ul>
+                <div class="tip blue"><strong>Read Replicas</strong> = performance (async). <strong>Multi-AZ</strong> = availability/DR (sync). They are different features.</div>
+            </div>
+            <div>
+                <h3>Aurora</h3>
+                <ul>
+                    <li>AWS proprietary, MySQL/Postgres compatible</li>
+                    <li>5x faster than MySQL RDS, 3x faster than Postgres RDS</li>
+                    <li>Storage auto-grows in 10GB increments up to 128TB</li>
+                    <li>Up to 15 read replicas, sub-10ms replica lag</li>
+                    <li>Instantaneous failover (HA native)</li>
+                    <li>Aurora Serverless — auto-scaling, pay per second</li>
+                    <li>Global Aurora — 1 primary + up to 5 secondary regions, &lt;1s lag</li>
+                </ul>
+            </div>
+        </div>
+        <div class="tip red"><strong>Exam:</strong> RDS 1040 "Too Many Connections" → enable RDS Proxy (connection pooling). Enhanced Monitoring = agent on instance. Default Monitoring = hypervisor level.</div>
+    </section>
+
+    <!-- ===== ElastiCache ===== -->
+    <section id="elasticache">
+        <h2 class="section-title">⚡ ElastiCache</h2>
+        <table>
+            <tr><th>Feature</th><th>Redis</th><th>Memcached</th></tr>
+            <tr><td>Persistence</td><td>✅ Survives reboot</td><td>❌ Lost on reboot</td></tr>
+            <tr><td>Multi-AZ / Failover</td><td>✅</td><td>❌</td></tr>
+            <tr><td>Read Replicas</td><td>✅</td><td>❌</td></tr>
+            <tr><td>Pub/Sub</td><td>✅</td><td>❌</td></tr>
+            <tr><td>Sharding</td><td>✅</td><td>✅ (multi-node)</td></tr>
+            <tr><td>Use case</td><td>Sessions, leaderboards, pub/sub, DR</td><td>Simple caching, multi-thread</td></tr>
+        </table>
+        <h3>Caching Strategies</h3>
+        <div class="two-col">
+            <div class="card">
+                <h4>Lazy Loading (Cache-Aside)</h4>
+                <ul>
+                    <li>Read from cache → miss → read DB → write to cache</li>
+                    <li>✅ Only caches requested data</li>
+                    <li>❌ Cache miss = 3 round trips; stale data possible</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h4>Write-Through</h4>
+                <ul>
+                    <li>Write to DB → also write to cache</li>
+                    <li>✅ Data never stale</li>
+                    <li>❌ Cache churn; missing data until first write</li>
+                </ul>
+            </div>
+        </div>
+        <div class="tip"><strong>TTL</strong> — set TTL to avoid stale data. Too many evictions → scale up/out.</div>
+    </section>
+
+    <!-- ===== S3 ===== -->
+    <section id="s3">
+        <h2 class="section-title">🪣 S3 — Simple Storage Service</h2>
+        <div class="grid">
+            <div class="card">
+                <h3>Basics</h3>
+                <ul>
+                    <li>Globally unique bucket names, region-specific</li>
+                    <li>Max object size: 5TB; use multipart upload for &gt;100MB</li>
+                    <li>3500 PUT/s, 5500 GET/s per prefix</li>
+                    <li>Versioning at bucket level</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>Encryption Methods</h3>
+                <ul>
+                    <li><strong>SSE-S3</strong> — AWS managed keys, header: <code>x-amz-server-side-encryption: AES256</code></li>
+                    <li><strong>SSE-KMS</strong> — KMS managed, header: <code>aws:kms</code>, audit trail</li>
+                    <li><strong>SSE-C</strong> — customer managed keys, HTTPS required, key in every request</li>
+                    <li><strong>Client-Side</strong> — encrypt before upload</li>
+                </ul>
+            </div>
+        </div>
+        <h3>S3 Security</h3>
+        <ul>
+            <li><strong>Bucket Policies</strong> — JSON, resource-based, cross-account access</li>
+            <li><strong>ACLs</strong> — finer grain per object</li>
+            <li><strong>VPC Endpoints</strong> — access S3 without internet from VPC</li>
+            <li><strong>MFA Delete</strong> — required for versioned bucket deletes</li>
+            <li><strong>Pre-signed URLs</strong> — time-limited access to private objects</li>
+        </ul>
+        <h3>S3 Performance &amp; Features</h3>
+        <ul>
+            <li><strong>Transfer Acceleration</strong> — uses CloudFront edge locations; bucket name must be DNS-compliant (no periods)</li>
+            <li><strong>S3 Object Lambda</strong> — transform data on-the-fly as it's returned (e.g., redact PII)</li>
+            <li><strong>CORS</strong> — must enable if requesting from another S3 bucket/domain</li>
+            <li><strong>Event Notifications</strong> → SQS, SNS, Lambda</li>
+            <li><strong>Cross-Region Replication</strong> — requires versioning enabled on both buckets</li>
+        </ul>
+        <div class="tip red"><strong>Consistency:</strong> S3 now provides strong read-after-write consistency for all operations (as of Dec 2020). Old notes about eventual consistency are outdated for the exam.</div>
+        <div class="tip"><strong>Exam:</strong> 403 on static website = bucket policy doesn't allow public reads. CORS needed for cross-origin requests.</div>
+    </section>
+
+    <!-- ===== VPC ===== -->
+    <section id="vpc">
+        <h2 class="section-title">🌐 VPC &amp; Security Groups</h2>
+        <div class="two-col">
+            <div class="card">
+                <h3>VPC Basics</h3>
+                <ul>
+                    <li>VPC per Account per Region; Subnets per VPC per AZ</li>
+                    <li>Public subnets: LBs, static sites, public auth layers</li>
+                    <li>Private subnets: app servers, databases</li>
+                    <li>VPC Peering — connect VPCs (same or cross-account)</li>
+                    <li>VPC Flow Logs — monitor traffic in/out</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>Security Groups vs NACLs</h3>
+                <ul>
+                    <li><strong>Security Groups</strong> — stateful; allow inbound = allow return outbound automatically</li>
+                    <li><strong>NACLs</strong> — stateless; must explicitly allow both inbound AND outbound</li>
+                    <li>SG: all inbound blocked by default, all outbound allowed</li>
+                    <li>Timeout error = SG issue; Connection refused = app issue</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== CLI / SDK ===== -->
+    <section id="cli-sdk">
+        <h2 class="section-title">🛠️ CLI &amp; SDK</h2>
+        <div class="two-col">
+            <div>
+                <h3>CLI Key Points</h3>
+                <ul>
+                    <li><code>aws configure</code> — set credentials locally</li>
+                    <li><code>aws configure --profile name</code> — multiple accounts</li>
+                    <li>EC2 instances: use IAM Roles, never store credentials on instance</li>
+                    <li><code>aws sts decode-authorization-message</code> — decode encoded errors (needs STS permission)</li>
+                    <li><code>--dry-run</code> — test permissions without executing</li>
+                </ul>
+            </div>
+            <div>
+                <h3>SDK Key Points</h3>
+                <ul>
+                    <li>Default region if not specified: <strong>us-east-1</strong></li>
+                    <li>Credential chain: code env vars → ~/.aws/credentials → IAM Role</li>
+                    <li><strong>NEVER store credentials in code</strong></li>
+                    <li><strong>Exponential Backoff</strong> — for HTTP 429 (throttling); built into SDK</li>
+                    <li>AWS CLI uses Python SDK (boto3)</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== CI/CD ===== -->
+    <section id="cicd">
+        <h2 class="section-title">🔄 CI/CD Overview</h2>
+        <div class="grid">
+            <div class="card"><h3>CodeCommit</h3><p>Private Git repos. Auth via SSH or HTTPS. IAM for authorization. Encrypted at rest (KMS). <span class="badge red">Deprecated</span> for new accounts.</p></div>
+            <div class="card"><h3>CodeBuild</h3><p>Managed build service. Uses <code>buildspec.yml</code>. Docker-based. Pay per build minute. Can run locally with CodeBuild Agent.</p></div>
+            <div class="card"><h3>CodeDeploy</h3><p>Deploy to EC2/On-Premise/Lambda. Uses <code>appspec.yml</code>. Agent required on EC2. Supports In-Place, Blue/Green, Linear.</p></div>
+            <div class="card"><h3>CodePipeline</h3><p>Orchestrates the pipeline. Artifacts stored in S3. State changes → CloudWatch Events → SNS. IAM role must have correct permissions.</p></div>
+        </div>
+    </section>
+
+    <!-- ===== CodeCommit ===== -->
+    <section id="codecommit">
+        <h2 class="section-title">📦 CodeCommit</h2>
+        <ul>
+            <li>Auth: SSH keys (configured in IAM) or HTTPS credentials</li>
+            <li>Cross-account access: use IAM Role + STS AssumeRole (never share SSH keys)</li>
+            <li>Notifications: SNS/Lambda for branch deletion, pushes to master; CloudWatch Events for PR updates</li>
+        </ul>
+        <div class="tip red"><strong>Deprecated</strong> — cannot create new repos. Existing repos still work.</div>
+    </section>
+
+    <!-- ===== CodeBuild ===== -->
+    <section id="codebuild">
+        <h2 class="section-title">🏗️ CodeBuild</h2>
+        <h3>buildspec.yml Structure</h3>
+        <pre><code>version: 0.2
+env:
+  variables:
+    MY_VAR: "value"
+  parameter-store:
+    MY_SECRET: "/my/secret"   # SSM Parameter Store for secrets
+phases:
+  install:
+    commands:
+      - npm install
+  pre_build:
+    commands:
+      - echo Pre-build...
+  build:
+    commands:
+      - npm run build
+  post_build:
+    commands:
+      - echo Done
+artifacts:
+  files:
+    - '**/*'
+  base-directory: dist
+cache:
+  paths:
+    - node_modules/**/*</code></pre>
+        <div class="tip"><strong>buildspec.yml must be at the root of your code.</strong> Use SSM Parameter Store for secrets (not plaintext env vars). Artifacts are uploaded to S3 (encrypted with KMS).</div>
+        <div class="tip blue"><strong>Local debugging:</strong> Install Docker + CodeBuild Agent to reproduce builds locally.</div>
+    </section>
+
+    <!-- ===== CodeDeploy ===== -->
+    <section id="codedeploy">
+        <h2 class="section-title">🚀 CodeDeploy</h2>
+        <h3>appspec.yml Hooks (in order)</h3>
+        <ol>
+            <li>ApplicationStop</li>
+            <li>DownloadBundle</li>
+            <li>BeforeInstall</li>
+            <li>AfterInstall</li>
+            <li>ApplicationStart</li>
+            <li><strong>ValidateService</strong> ← most important</li>
+        </ol>
+        <h3>Deployment Configurations</h3>
+        <table>
+            <tr><th>Config</th><th>Description</th></tr>
+            <tr><td>AllAtOnce</td><td>Fastest, downtime, good for dev</td></tr>
+            <tr><td>HalfAtATime</td><td>50% at a time</td></tr>
+            <tr><td>OneAtATime</td><td>Slowest, one fails = stop</td></tr>
+            <tr><td>Custom</td><td>Define min healthy host %</td></tr>
+        </table>
+        <h3>Deployment Types</h3>
+        <ul>
+            <li><strong>In-Place</strong> — existing instances updated</li>
+            <li><strong>Blue/Green</strong> — new ASG created, traffic shifted, old ASG deleted. EC2 only (not on-premise)</li>
+            <li><strong>Linear</strong> — equal increments at equal intervals (e.g., 10% every 10 min)</li>
+            <li><strong>Canary</strong> — X% then 100%</li>
+        </ul>
+        <div class="tip red"><strong>CodeDeploy does NOT provision resources.</strong> Agent must be running on EC2/on-premise. Not needed for Lambda deployments.</div>
+    </section>
+
+    <!-- ===== CodePipeline ===== -->
+    <section id="codepipeline">
+        <h2 class="section-title">🔁 CodePipeline</h2>
+        <ul>
+            <li>Stages: Source → Build → Test → Deploy (sequential or parallel actions)</li>
+            <li>Artifacts stored in S3 between stages (versioning must be enabled)</li>
+            <li>State changes → CloudWatch Events → SNS notifications</li>
+            <li>Manual approval can be added at any stage</li>
+            <li>If pipeline fails: check IAM Service Role permissions + CloudTrail for API audit</li>
+        </ul>
+    </section>
+
+    <!-- ===== LAMBDA ===== -->
+    <section id="lambda">
+        <h2 class="section-title">λ Lambda</h2>
+        <div class="grid">
+            <div class="card">
+                <h3>Limits</h3>
+                <ul>
+                    <li>Memory: 128MB – 10GB</li>
+                    <li>Timeout: max <strong>15 minutes</strong> (900s)</li>
+                    <li>Env variables: 4KB</li>
+                    <li>/tmp disk: 512MB – 10GB</li>
+                    <li>Concurrent executions: <strong>1000/account</strong> (soft limit)</li>
+                    <li>Deployment package: 50MB compressed, 250MB uncompressed</li>
+                    <li>Container image: up to 10GB</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>Invocation Types</h3>
+                <ul>
+                    <li><strong>Sync</strong> — ALB, API Gateway, CloudFront, CLI/SDK. Error handling on client side.</li>
+                    <li><strong>Async</strong> — S3, SNS, CloudWatch Events. 3 retries (0min, 1min, 2min). DLQ for failures.</li>
+                    <li><strong>Event Source Mapping</strong> — SQS, Kinesis, DynamoDB Streams. Lambda polls the source.</li>
+                </ul>
+            </div>
+        </div>
+        <h3>Concurrency &amp; Throttling</h3>
+        <ul>
+            <li><strong>Reserved Concurrency</strong> — guarantees max concurrency for a function; prevents it from using unreserved pool</li>
+            <li><strong>Provisioned Concurrency</strong> — pre-warms instances, eliminates cold starts</li>
+            <li>Throttle: Sync → <code>429 ThrottleError</code>; Async → retry + DLQ</li>
+            <li>One function without reserved concurrency can consume all 1000 concurrent executions</li>
+        </ul>
+        <h3>Versions &amp; Aliases</h3>
+        <ul>
+            <li>Working version = <code>$LATEST</code> (mutable)</li>
+            <li>Published versions are immutable (own ARN)</li>
+            <li>Aliases are mutable pointers to versions; support weighted routing (Blue/Green)</li>
+            <li><strong>Aliases cannot reference other aliases</strong></li>
+        </ul>
+        <h3>Lambda + CodeDeploy Traffic Shifting</h3>
+        <ul>
+            <li><strong>Linear</strong> — e.g., Linear10PercentEvery3Minutes</li>
+            <li><strong>Canary</strong> — e.g., Canary10Percent5Minutes</li>
+            <li><strong>AllAtOnce</strong> — immediate</li>
+        </ul>
+        <h3>Event Source Mapping Details</h3>
+        <table>
+            <tr><th>Source</th><th>Behavior</th></tr>
+            <tr><td>SQS</td><td>Long polling, batch 1-10, DLQ on queue (not Lambda), visibility timeout = 6x Lambda timeout</td></tr>
+            <tr><td>Kinesis / DynamoDB Streams</td><td>One invocation per shard, in-order, up to 10 parallel batches per shard</td></tr>
+            <tr><td>SQS FIFO</td><td>Scales to number of message groups, in-order per group</td></tr>
+        </table>
+        <div class="tip red"><strong>Never have a Lambda call itself recursively</strong> — can cause runaway costs.</div>
+        <div class="tip"><strong>Best practice:</strong> Initialize DB connections outside the handler (reused across invocations). Use /tmp for temp files, S3 for persistence.</div>
+        <h3>Lambda@Edge</h3>
+        <p>Run Lambda functions at CloudFront edge locations. Can modify viewer/origin requests and responses. Use cases: A/B testing, auth, bot mitigation, image transformation.</p>
+        <h3>Lambda in VPC</h3>
+        <ul>
+            <li>By default Lambda runs outside your VPC (can access internet)</li>
+            <li>Lambda in VPC: creates ENI, needs <code>AWSLambdaVPCAccessExecutionRole</code></li>
+            <li>Lambda in VPC cannot access internet unless NAT Gateway is configured</li>
+            <li>DynamoDB accessible via VPC endpoint or public internet</li>
+        </ul>
+    </section>
+
+    <!-- ===== DYNAMODB ===== -->
+    <section id="dynamodb">
+        <h2 class="section-title">🗃️ DynamoDB</h2>
+        <div class="grid">
+            <div class="card">
+                <h3>Capacity Units</h3>
+                <ul>
+                    <li><strong>WCU</strong>: 1 write/s for items up to 1KB. Round up item size.</li>
+                    <li><strong>RCU (Strong)</strong>: 1 read/s for items up to 4KB</li>
+                    <li><strong>RCU (Eventual)</strong>: 2 reads/s for items up to 4KB</li>
+                    <li>Transactions: 2x WCU/RCU</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>WCU/RCU Examples</h3>
+                <ul>
+                    <li>10 items/s × 2KB = <strong>20 WCU</strong></li>
+                    <li>6 items/s × 4.5KB → round to 5KB = <strong>30 WCU</strong></li>
+                    <li>10 strong reads/s × 4KB = <strong>10 RCU</strong></li>
+                    <li>16 eventual reads/s × 12KB = (16/2) × (12/4) = <strong>24 RCU</strong></li>
+                </ul>
+            </div>
+        </div>
+        <h3>Indexes</h3>
+        <table>
+            <tr><th>Feature</th><th>LSI</th><th>GSI</th></tr>
+            <tr><td>Created</td><td>At table creation only</td><td>Anytime</td></tr>
+            <tr><td>Partition Key</td><td>Same as table</td><td>Any attribute</td></tr>
+            <tr><td>Consistency</td><td>Strong or Eventual</td><td>Eventual only</td></tr>
+            <tr><td>Capacity</td><td>Shares table WCU/RCU</td><td>Own WCU/RCU</td></tr>
+            <tr><td>Throttle impact</td><td>Cannot throttle main table</td><td>GSI throttle = main table throttle</td></tr>
+        </table>
+        <h3>Key APIs</h3>
+        <div class="two-col">
+            <ul>
+                <li><code>PutItem</code> — create or full replace</li>
+                <li><code>UpdateItem</code> — partial update, atomic counters</li>
+                <li><code>DeleteItem</code> — conditional delete</li>
+                <li><code>BatchWriteItem</code> — up to 25 PutItem/DeleteItem</li>
+                <li><code>GetItem</code> — by primary key</li>
+            </ul>
+            <ul>
+                <li><code>BatchGetItem</code> — up to 100 items</li>
+                <li><code>Query</code> — by partition key (efficient)</li>
+                <li><code>Scan</code> — full table scan (expensive, avoid)</li>
+                <li><code>TransactWriteItems</code> — all-or-nothing across tables</li>
+            </ul>
+        </div>
+        <h3>DAX — DynamoDB Accelerator</h3>
+        <ul>
+            <li>In-memory cache, microsecond latency, no code changes needed</li>
+            <li>Solves Hot Key problem</li>
+            <li>Default 5-min TTL, up to 10 nodes, Multi-AZ</li>
+        </ul>
+        <h3>DynamoDB Streams</h3>
+        <ul>
+            <li>Changes (create/update/delete) pushed to stream</li>
+            <li>24-hour retention (fixed)</li>
+            <li>Stream types: KEYS_ONLY, NEW_IMAGE, OLD_IMAGE, NEW_AND_OLD_IMAGES</li>
+            <li>Lambda reads via event source mapping (synchronous)</li>
+        </ul>
+        <h3>TTL</h3>
+        <p>Auto-delete items after expiry. No extra cost. Deletion happens within 48 hours. TTL column must be a Number (epoch timestamp). Deleted items also removed from GSI/LSI.</p>
+        <div class="tip red"><strong>GSI throttle = main table throttle.</strong> If GSI WCU is too low, writes to the main table will be throttled even if main table WCU is fine.</div>
+        <div class="tip"><strong>Table cleanup:</strong> Drop table (fast/cheap) vs Scan+Delete (slow/expensive). <strong>Copy table:</strong> backup → restore to new table.</div>
+    </section>
+
+    <!-- ===== API GATEWAY ===== -->
+    <section id="apigateway">
+        <h2 class="section-title">🌉 API Gateway</h2>
+        <div class="grid">
+            <div class="card">
+                <h3>Endpoint Types</h3>
+                <ul>
+                    <li><strong>Edge-Optimized</strong> (default) — global, routes via CloudFront</li>
+                    <li><strong>Regional</strong> — same region clients</li>
+                    <li><strong>Private</strong> — VPC only via VPC endpoint</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>Integration Types</h3>
+                <ul>
+                    <li><strong>MOCK</strong> — no backend call</li>
+                    <li><strong>HTTP/AWS</strong> — with mapping templates (VTL)</li>
+                    <li><strong>AWS_PROXY (Lambda Proxy)</strong> — no mapping, raw pass-through</li>
+                    <li><strong>HTTP_PROXY</strong> — raw pass-through to HTTP backend</li>
+                </ul>
+            </div>
+        </div>
+        <h3>Authorization</h3>
+        <table>
+            <tr><th>Method</th><th>Auth</th><th>Authz</th></tr>
+            <tr><td>IAM + Sig v4</td><td>IAM</td><td>IAM Policy</td></tr>
+            <tr><td>Cognito User Pools</td><td>Cognito</td><td>API Gateway Methods</td></tr>
+            <tr><td>Lambda Authorizer</td><td>External (JWT/token)</td><td>Lambda returns IAM policy</td></tr>
+        </table>
+        <div class="tip blue"><strong>Cannot use Cognito Identity Pool as an authorizer</strong> — only Cognito User Pools.</div>
+        <h3>Key Metrics &amp; Limits</h3>
+        <ul>
+            <li>Default throttle: <strong>10,000 req/s</strong> across all APIs (soft limit)</li>
+            <li>Throttle response: <strong>429 Too Many Requests</strong></li>
+            <li>Max integration timeout: <strong>29 seconds</strong></li>
+            <li>Cache TTL: 0–3600s (default 300s), per stage</li>
+            <li>Cache invalidation: <code>Cache-Control: max-age=0</code> header (needs IAM auth)</li>
+        </ul>
+        <h3>Stage Variables</h3>
+        <p>Like env vars for API Gateway stages. Pass Lambda alias via stage variable: <code>lambda-function:${stageVariable.lambdaAlias}</code></p>
+        <h3>HTTP API vs REST API</h3>
+        <ul>
+            <li><strong>HTTP API</strong> — cheaper, lower latency, supports OIDC/OAuth2, no usage plans/API keys, no data mapping</li>
+            <li><strong>REST API</strong> — full features, usage plans, API keys, mapping templates, no native OIDC/OAuth2</li>
+        </ul>
+    </section>
+
+    <!-- ===== COGNITO ===== -->
+    <section id="cognito">
+        <h2 class="section-title">👤 Cognito</h2>
+        <table>
+            <tr><th>Feature</th><th>User Pools</th><th>Identity Pools</th></tr>
+            <tr><td>Purpose</td><td>Authentication (sign-in/sign-up)</td><td>Authorization (AWS credentials)</td></tr>
+            <tr><td>Output</td><td>JWT token</td><td>Temporary AWS credentials via STS</td></tr>
+            <tr><td>Integrates with</td><td>API Gateway, ALB</td><td>AWS services directly</td></tr>
+            <tr><td>Supports</td><td>Social login, SAML, MFA</td><td>Guest/unauthenticated access</td></tr>
+        </table>
+        <div class="tip"><strong>User Pools</strong> = manage username/password. <strong>Identity Pools</strong> = give access to AWS services. They work together: User Pool authenticates → Identity Pool provides AWS credentials.</div>
+        <h3>Lambda Triggers (User Pools)</h3>
+        <p>Pre/Post auth, Pre/Post sign-up, Custom message, Pre token generation, Migrate user</p>
+    </section>
+
+    <!-- ===== STEP FUNCTIONS ===== -->
+    <section id="stepfunctions">
+        <h2 class="section-title">🔀 Step Functions</h2>
+        <table>
+            <tr><th>Feature</th><th>Standard</th><th>Express</th></tr>
+            <tr><td>Max duration</td><td>1 year</td><td>5 minutes</td></tr>
+            <tr><td>Execution model</td><td>Exactly-once</td><td>At-least-once (async) / At-most-once (sync)</td></tr>
+            <tr><td>Start rate</td><td>2,000/s</td><td>100,000/s</td></tr>
+            <tr><td>Pricing</td><td>Per state transition</td><td>Per execution (cheaper)</td></tr>
+        </table>
+        <div class="tip blue"><strong>Use Express</strong> for high-volume, short-duration workflows (IoT, streaming). <strong>Use Standard</strong> for long-running, auditable workflows.</div>
+        <p>Error handling: <code>Retry</code> with exponential backoff, <code>Catch</code> to transition to error state. Supports human approval steps.</p>
+    </section>
+
+    <!-- ===== SAM ===== -->
+    <section id="sam">
+        <h2 class="section-title">📐 SAM — Serverless Application Model</h2>
+        <ul>
+            <li>Framework for serverless apps; generates CloudFormation under the hood</li>
+            <li>Transform header: <code>Transform: 'AWS::Serverless-2016-10-31'</code></li>
+            <li>Resource types: <code>AWS::Serverless::Function</code>, <code>::Api</code>, <code>::SimpleTable</code></li>
+            <li>Local testing: <code>sam local invoke</code>, <code>sam local start-api</code></li>
+            <li>Deploy: <code>sam package</code> + <code>sam deploy</code></li>
+            <li>Publish to Serverless Application Repository: <code>sam publish</code></li>
+            <li>Integrates with CodeDeploy for traffic shifting</li>
+        </ul>
+    </section>
+
+    <!-- ===== APPSYNC ===== -->
+    <section id="appsync">
+        <h2 class="section-title">🔗 AppSync</h2>
+        <ul>
+            <li>Managed GraphQL service</li>
+            <li>Real-time data with WebSocket or MQTT</li>
+            <li>Resolvers: DynamoDB, Aurora, ElasticSearch, Lambda, HTTP</li>
+            <li>Auth: API_KEY, AWS_IAM, OPENID_CONNECT, AMAZON_COGNITO_USER_POOLS</li>
+            <li>Replacement for Cognito Sync (deprecated)</li>
+            <li>For custom domain + HTTPS: put CloudFront in front</li>
+        </ul>
+    </section>
+
+    <!-- ===== ECS ===== -->
+    <section id="ecs">
+        <h2 class="section-title">🐳 ECS — Elastic Container Service</h2>
+        <div class="grid">
+            <div class="card">
+                <h3>Core Concepts</h3>
+                <ul>
+                    <li><strong>Cluster</strong> — logical grouping of resources</li>
+                    <li><strong>Task Definition</strong> — blueprint (image, CPU, mem, ports)</li>
+                    <li><strong>Task</strong> — running instance of a task definition</li>
+                    <li><strong>Service</strong> — maintains desired task count, LB integration</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>IAM Roles</h3>
+                <ul>
+                    <li><strong>Task Role</strong> — permissions for containers to call AWS APIs (S3, DynamoDB, etc.)</li>
+                    <li><strong>Execution Role</strong> — pull images from ECR, write logs to CloudWatch</li>
+                </ul>
+            </div>
+        </div>
+        <table>
+            <tr><th>Feature</th><th>EC2 Launch Type</th><th>Fargate</th></tr>
+            <tr><td>Compute management</td><td>You manage EC2</td><td>AWS manages</td></tr>
+            <tr><td>Network modes</td><td>bridge, host, awsvpc, none</td><td>awsvpc only</td></tr>
+            <tr><td>Daemon service</td><td>✅</td><td>❌</td></tr>
+            <tr><td>OS control</td><td>Full</td><td>None</td></tr>
+        </table>
+        <div class="tip red"><strong>Fargate requires awsvpc network mode.</strong> Each task gets its own ENI and private IP. Security groups apply at task level.</div>
+        <div class="tip"><strong>X-Ray with ECS:</strong> Create a Docker image with X-Ray agent and publish to registry. Add as sidecar container in task definition.</div>
+        <p><strong>Decoupling databases:</strong> Remove security group first before deleting environment. Terminating stopped containers causes de-sync and does not remove instance from cluster.</p>
+    </section>
+
+    <!-- ===== ECR ===== -->
+    <section id="ecr">
+        <h2 class="section-title">📦 ECR — Elastic Container Registry</h2>
+        <ul>
+            <li>Managed Docker registry (private and public)</li>
+            <li>Integrated with ECS, EKS, Lambda</li>
+            <li>Encryption at rest (AES-256 or KMS), in transit (TLS)</li>
+            <li>Image scanning for vulnerabilities (basic on push, enhanced with Inspector)</li>
+            <li>Lifecycle policies — auto-expire old/untagged images</li>
+        </ul>
+        <h3>Auth &amp; Push Flow</h3>
+        <pre><code># Authenticate
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin &lt;account&gt;.dkr.ecr.us-east-1.amazonaws.com
+
+# Tag and push
+docker tag my-image:latest &lt;account&gt;.dkr.ecr.us-east-1.amazonaws.com/my-repo:latest
+docker push &lt;account&gt;.dkr.ecr.us-east-1.amazonaws.com/my-repo:latest</code></pre>
+        <div class="tip red"><strong>ECS Task Execution Role</strong> needs ECR pull permissions. ECR does NOT build images — only stores them.</div>
+    </section>
+
+    <!-- ===== FARGATE ===== -->
+    <section id="fargate">
+        <h2 class="section-title">☁️ Fargate</h2>
+        <ul>
+            <li>Serverless containers — no EC2 management</li>
+            <li>Works with ECS and EKS</li>
+            <li>Pay per vCPU-second and GB-second</li>
+            <li>Ephemeral storage: 20GB default, up to 200GB</li>
+            <li>For persistent storage: mount EFS</li>
+            <li>Cannot SSH into Fargate tasks</li>
+            <li>Task size: 0.25–16 vCPU, 0.5–120 GiB RAM</li>
+        </ul>
+    </section>
+
+    <!-- ===== SQS ===== -->
+    <section id="sqs">
+        <h2 class="section-title">📬 SQS — Simple Queue Service</h2>
+        <div class="grid">
+            <div class="card">
+                <h3>Standard Queue</h3>
+                <ul>
+                    <li>Unlimited throughput, unlimited messages</li>
+                    <li>At-least-once delivery (duplicates possible)</li>
+                    <li>Best-effort ordering</li>
+                    <li>Max message size: 256KB</li>
+                    <li>Retention: 4 days default, max 14 days</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>FIFO Queue</h3>
+                <ul>
+                    <li>Exactly-once processing</li>
+                    <li>Strict ordering</li>
+                    <li>300 msg/s (3000 with batching)</li>
+                    <li>Queue name must end with <code>.fifo</code></li>
+                    <li>Deduplication: content-based (SHA-256) or MessageDeduplicationID</li>
+                </ul>
+            </div>
+        </div>
+        <h3>Key Concepts</h3>
+        <ul>
+            <li><strong>Visibility Timeout</strong> — 0s–12h (default 30s). Message invisible to others while being processed. Use <code>ChangeMessageVisibility</code> to extend.</li>
+            <li><strong>Dead Letter Queue (DLQ)</strong> — after MaximumReceives exceeded. Set retention to 14 days. DLQ type must match queue type (FIFO DLQ for FIFO queue).</li>
+            <li><strong>Long Polling</strong> — WaitTimeSeconds 1–20s. Preferred over short polling. Reduces API calls.</li>
+            <li><strong>Delay Queue</strong> — DelaySeconds up to 15 min. Message not visible immediately.</li>
+            <li><strong>Extended Client</strong> — for messages &gt;256KB, stores payload in S3, sends pointer in message.</li>
+        </ul>
+        <div class="tip red"><strong>Lambda + SQS:</strong> Set visibility timeout = 6x Lambda timeout. Set DLQ on the SQS queue, NOT on Lambda. Lambda deletes messages after successful processing.</div>
+    </section>
+
+    <!-- ===== SNS ===== -->
+    <section id="sns">
+        <h2 class="section-title">📢 SNS — Simple Notification Service</h2>
+        <ul>
+            <li>Pub/Sub model — one topic, many subscribers</li>
+            <li>Up to 10M subscriptions/topic, 100K topics</li>
+            <li>Subscribers: SQS, HTTP/HTTPS, Lambda, Email, SMS, Mobile Push</li>
+            <li>Messages not persisted — if subscriber is down, message is lost</li>
+            <li>Encryption: in-flight (HTTPS), at-rest (KMS), client-side</li>
+        </ul>
+        <h3>SNS + SQS Fan-Out Pattern</h3>
+        <p>Publish to SNS → multiple SQS queues subscribe → each queue processes independently. Decoupled, no data loss, can add subscribers later.</p>
+        <div class="tip blue"><strong>Fan-out</strong> is the key pattern: SNS → multiple SQS queues. This is a very common exam scenario.</div>
+    </section>
+
+    <!-- ===== KINESIS ===== -->
+    <section id="kinesis">
+        <h2 class="section-title">🌊 Kinesis</h2>
+        <div class="grid">
+            <div class="card">
+                <h3>Kinesis Data Streams</h3>
+                <ul>
+                    <li>Real-time streaming, ordered per shard</li>
+                    <li>Write: 1MB/s or 1000 msg/s per shard</li>
+                    <li>Read: 2MB/s per shard</li>
+                    <li>Data retention: 1–365 days</li>
+                    <li>Data can be replayed</li>
+                    <li>Must provision shards</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>Kinesis Firehose</h3>
+                <ul>
+                    <li>Near real-time (60s latency)</li>
+                    <li>Fully managed, auto-scaling</li>
+                    <li>Destinations: S3, Redshift, ElasticSearch, Splunk</li>
+                    <li>Pay for data volume</li>
+                    <li>No data storage/replay</li>
+                </ul>
+            </div>
+        </div>
+        <h3>SQS vs SNS vs Kinesis</h3>
+        <table>
+            <tr><th></th><th>SQS</th><th>SNS</th><th>Kinesis</th></tr>
+            <tr><td>Pattern</td><td>Pull (consumer polls)</td><td>Push (fan-out)</td><td>Pull (consumer polls)</td></tr>
+            <tr><td>Persistence</td><td>Up to 14 days</td><td>No persistence</td><td>1–365 days</td></tr>
+            <tr><td>Ordering</td><td>FIFO only</td><td>No</td><td>Per shard</td></tr>
+            <tr><td>Replay</td><td>❌</td><td>❌</td><td>✅</td></tr>
+            <tr><td>Throughput</td><td>No provisioning</td><td>No provisioning</td><td>Must provision shards</td></tr>
+            <tr><td>Use case</td><td>Decouple services</td><td>Notifications, fan-out</td><td>Real-time analytics, big data</td></tr>
+        </table>
+        <div class="tip red"><strong>ProvisionedThroughputExceededException</strong> in Kinesis → exponential backoff, add shards, or use more distributed partition keys.</div>
+    </section>
+
+    <!-- ===== CLOUDWATCH ===== -->
+    <section id="cloudwatch">
+        <h2 class="section-title">📊 CloudWatch</h2>
+        <div class="grid">
+            <div class="card">
+                <h3>Metrics</h3>
+                <ul>
+                    <li>EC2 default: every 5 min. Detailed monitoring: every 1 min (cost)</li>
+                    <li>Memory usage NOT included by default — must install CloudWatch Agent</li>
+                    <li>Custom metrics: <code>PutMetricData</code> API</li>
+                    <li>Standard resolution: 1 min. High resolution: 1 sec (StorageResolution)</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>Logs</h3>
+                <ul>
+                    <li>Log Groups → Log Streams</li>
+                    <li>Set expiration policy at Log Group level</li>
+                    <li>Encryption with KMS at Group level</li>
+                    <li>Export to S3 (batch) or stream to ElasticSearch</li>
+                    <li>Lambda logs automatically go to CloudWatch (if IAM policy allows)</li>
+                </ul>
+            </div>
+        </div>
+        <h3>Alarms</h3>
+        <ul>
+            <li>States: OK, INSUFFICIENT_DATA, ALARM</li>
+            <li>Actions: Auto Scaling, EC2 actions, SNS notifications</li>
+            <li>High-resolution alarms: 10s or 30s periods</li>
+        </ul>
+        <h3>CloudWatch Events / EventBridge</h3>
+        <ul>
+            <li>Schedule: cron jobs (serverless CRON)</li>
+            <li>Event Pattern: react to AWS service events (CodePipeline state change, etc.)</li>
+            <li>Targets: Lambda, SQS, SNS, Kinesis</li>
+        </ul>
+    </section>
+
+    <!-- ===== X-RAY ===== -->
+    <section id="xray">
+        <h2 class="section-title">🔍 X-Ray</h2>
+        <ul>
+            <li>Distributed tracing for microservices</li>
+            <li>Segments → Sub-segments → Traces</li>
+            <li>Annotations (key/value, up to 50) — indexed, searchable</li>
+            <li>Metadata — not indexed, store any data</li>
+        </ul>
+        <h3>How to Enable</h3>
+        <ol>
+            <li>Import X-Ray SDK in code (Java, Python, Go, Node.js, .NET)</li>
+            <li>Install X-Ray Daemon on EC2 (or enable X-Ray integration on Lambda)</li>
+            <li>IAM role must have write permissions to X-Ray</li>
+        </ol>
+        <h3>Service-Specific Setup</h3>
+        <table>
+            <tr><th>Service</th><th>How to enable</th></tr>
+            <tr><td>EC2</td><td>Run X-Ray daemon + IAM role</td></tr>
+            <tr><td>Lambda</td><td>Enable in console + <code>AWSXRayWriteOnlyAccess</code> policy</td></tr>
+            <tr><td>Elastic Beanstalk</td><td>Add <code>xray-daemon.config</code> to <code>.ebextensions/</code></td></tr>
+            <tr><td>ECS</td><td>X-Ray daemon as sidecar container</td></tr>
+            <tr><td>API Gateway</td><td>Enable tracing in stage settings</td></tr>
+        </table>
+        <h3>X-Ray Environment Variables</h3>
+        <ul>
+            <li><code>_X_AMZN_TRACE_ID</code> — tracing header</li>
+            <li><code>AWS_XRAY_CONTEXT_MISSING</code> — LOG_ERROR by default</li>
+            <li><code>AWS_XRAY_DAEMON_ADDRESS</code> — IP:PORT of daemon</li>
+        </ul>
+    </section>
+
+    <!-- ===== CLOUDTRAIL ===== -->
+    <section id="cloudtrail">
+        <h2 class="section-title">📋 CloudTrail</h2>
+        <ul>
+            <li>Enabled by default — records all API calls (Console, SDK, CLI, services)</li>
+            <li>Governance, compliance, and audit</li>
+            <li>Logs can be sent to CloudWatch Logs or S3</li>
+            <li><strong>If a resource is deleted unexpectedly → check CloudTrail first</strong></li>
+            <li>Can be used with Config for deeper resource change insight</li>
+        </ul>
+    </section>
+
+    <!-- ===== CONFIG ===== -->
+    <section id="config">
+        <h2 class="section-title">⚙️ AWS Config</h2>
+        <ul>
+            <li>Compliance checks for AWS resources</li>
+            <li>Periodic or triggered evaluations</li>
+            <li>Requires IAM Role: read-only to resources, write to S3, publish to SNS</li>
+            <li>Use with CloudTrail for deeper audit insight</li>
+        </ul>
+    </section>
+
+    <!-- ===== CLOUDFORMATION ===== -->
+    <section id="cloudformation">
+        <h2 class="section-title">📄 CloudFormation</h2>
+        <div class="grid">
+            <div class="card">
+                <h3>Template Sections</h3>
+                <ul>
+                    <li><strong>Resources</strong> — MANDATORY. AWS resources to create.</li>
+                    <li><strong>Parameters</strong> — dynamic inputs (<code>!Ref</code>)</li>
+                    <li><strong>Mappings</strong> — static variables (<code>!FindInMap</code>)</li>
+                    <li><strong>Outputs</strong> — export values for cross-stack reference</li>
+                    <li><strong>Conditions</strong> — conditional resource creation</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>Intrinsic Functions</h3>
+                <ul>
+                    <li><code>!Ref</code> — reference parameter or resource</li>
+                    <li><code>!GetAtt</code> — get attribute of resource</li>
+                    <li><code>!FindInMap</code> — lookup in Mappings</li>
+                    <li><code>!ImportValue</code> — import from another stack's Output</li>
+                    <li><code>!Sub</code> — string substitution</li>
+                    <li><code>!Join</code> — join strings with delimiter</li>
+                    <li><code>!If / !And / !Or / !Not / !Equals</code> — conditions</li>
+                </ul>
+            </div>
+        </div>
+        <div class="tip red"><strong>Cannot delete a stack</strong> if its Outputs are referenced by another stack. Templates must be re-uploaded to S3 (cannot edit in place). Deleting a stack deletes ALL resources it created.</div>
+        <div class="tip"><strong>Rollback:</strong> Stack creation failure → everything rolls back by default. Stack update failure → rolls back to last known working state.</div>
+        <h3>Lambda in CloudFormation</h3>
+        <p>Inline code (NodeJS/Python only, no dependencies) using <code>ZipFile</code>. For complex functions: reference S3 bucket/key. <strong>Must update S3ObjectVersion to trigger CloudFormation update.</strong></p>
+    </section>
+
+    <!-- ===== ELASTIC BEANSTALK ===== -->
+    <section id="beanstalk">
+        <h2 class="section-title">🌱 Elastic Beanstalk</h2>
+        <h3>Deployment Modes</h3>
+        <table>
+            <tr><th>Mode</th><th>Downtime</th><th>Cost</th><th>Rollback</th><th>Best for</th></tr>
+            <tr><td>All at once</td><td>Yes</td><td>None</td><td>Manual redeploy</td><td>Dev/test</td></tr>
+            <tr><td>Rolling</td><td>Partial (below capacity)</td><td>None</td><td>Manual redeploy</td><td>Prod (tolerant)</td></tr>
+            <tr><td>Rolling + extra batch</td><td>No (at capacity)</td><td>Small extra</td><td>Manual redeploy</td><td>Prod</td></tr>
+            <tr><td>Immutable</td><td>No</td><td>2x (temp)</td><td>Terminate new ASG</td><td>Prod (safest)</td></tr>
+            <tr><td>Blue/Green</td><td>No</td><td>2x</td><td>Swap URL back</td><td>Prod (manual)</td></tr>
+        </table>
+        <h3>Key Points</h3>
+        <ul>
+            <li>Free service — pay for underlying resources</li>
+            <li>Relies on CloudFormation under the hood</li>
+            <li><strong>.ebextensions/</strong> — config files (YAML/JSON, .config extension) in root of source code</li>
+            <li>Can enable X-Ray, add RDS/ElastiCache/DynamoDB via .ebextensions</li>
+            <li>Resources in .ebextensions are deleted when environment is deleted</li>
+            <li>Blue/Green: use Route 53 weighted policy + "Swap URLs" in console (manual)</li>
+            <li>Docker: add <code>Dockerrun.aws.json</code> to app directory</li>
+        </ul>
+        <div class="tip blue"><strong>Optimization:</strong> Package dependencies with source code (not resolved on each EC2 at deploy time) to speed up deployments.</div>
+    </section>
+
+    <!-- ===== KMS ===== -->
+    <section id="kms">
+        <h2 class="section-title">🔑 KMS — Key Management Service</h2>
+        <ul>
+            <li>Managed encryption keys for AWS services</li>
+            <li>Automatic key rotation: <strong>symmetric keys only</strong> (not asymmetric, not customer-imported keys)</li>
+            <li>Used by: S3 (SSE-KMS), EBS, RDS, DynamoDB, Lambda env vars, CloudWatch Logs, etc.</li>
+            <li>CMK (Customer Master Key): AWS managed or customer managed</li>
+            <li>Envelope encryption: data key encrypts data, CMK encrypts data key</li>
+        </ul>
+        <div class="tip red"><strong>Automatic rotation only works for symmetric CMKs.</strong> Asymmetric keys, imported keys, and customer-managed keys require manual rotation.</div>
+    </section>
+
+    <!-- ===== SECRETS MANAGER ===== -->
+    <section id="secrets">
+        <h2 class="section-title">🔒 Secrets Manager &amp; SSM Parameter Store</h2>
+        <table>
+            <tr><th>Feature</th><th>Secrets Manager</th><th>SSM Parameter Store</th></tr>
+            <tr><td>Auto rotation</td><td>✅ Built-in (e.g., RDS every 90 days)</td><td>❌ Manual (use Lambda)</td></tr>
+            <tr><td>Cost</td><td>Higher</td><td>Free (standard) / Low cost (advanced)</td></tr>
+            <tr><td>Encryption</td><td>KMS</td><td>KMS (SecureString)</td></tr>
+            <tr><td>Use case</td><td>DB credentials, API keys needing rotation</td><td>Config, non-rotating secrets</td></tr>
+        </table>
+        <div class="tip"><strong>CodeBuild buildspec.yml</strong> can reference SSM Parameter Store for secrets using <code>parameter-store</code> section.</div>
+    </section>
+
+    <!-- ===== CLOUDFRONT ===== -->
+    <section id="cloudfront">
+        <h2 class="section-title">🌍 CloudFront</h2>
+        <ul>
+            <li>CDN — caches content at edge locations globally</li>
+            <li>Force SSL: set Viewer Protocol Policy to "Redirect HTTP to HTTPS" or "HTTPS only"</li>
+            <li>Geo-restriction: whitelist/blacklist countries</li>
+            <li>Custom headers: <code>CloudFront-Viewer-Country</code>, timezone, etc.</li>
+            <li>Origin types: S3, ALB, EC2, HTTP endpoint</li>
+            <li>Signed URLs / Signed Cookies — restrict access to premium content</li>
+            <li>OAI (Origin Access Identity) — restrict S3 access to CloudFront only</li>
+        </ul>
+    </section>
+
+    <!-- ===== EXAM QUICK REFERENCE ===== -->
+    <section id="quickref">
+        <h2 class="section-title">⚡ Exam Quick Reference</h2>
+        <div class="grid">
+            <div class="card">
+                <h3>Common Error Codes</h3>
+                <ul>
+                    <li><strong>400</strong> — Bad Request (client error)</li>
+                    <li><strong>403</strong> — Forbidden (IAM/bucket policy)</li>
+                    <li><strong>429</strong> — Too Many Requests (throttling)</li>
+                    <li><strong>500</strong> — Internal Server Error</li>
+                    <li><strong>502</strong> — Bad Gateway (incompatible backend output)</li>
+                    <li><strong>503</strong> — Service Unavailable (LB no targets)</li>
+                    <li><strong>504</strong> — Gateway Timeout (backend timeout)</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>Default Regions / Limits</h3>
+                <ul>
+                    <li>SDK default region: <strong>us-east-1</strong></li>
+                    <li>Lambda concurrent executions: <strong>1000/account</strong></li>
+                    <li>Lambda timeout: <strong>15 min max</strong></li>
+                    <li>API Gateway timeout: <strong>29 seconds</strong></li>
+                    <li>SQS visibility timeout: <strong>30s default, 12h max</strong></li>
+                    <li>SQS message retention: <strong>4 days default, 14 days max</strong></li>
+                    <li>DynamoDB item max size: <strong>400KB</strong></li>
+                    <li>DynamoDB Streams retention: <strong>24 hours (fixed)</strong></li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>Key "Always" Rules</h3>
+                <ul>
+                    <li>Never store credentials in code</li>
+                    <li>Use IAM Roles for EC2/Lambda (not access keys)</li>
+                    <li>Resource deleted unexpectedly → check CloudTrail</li>
+                    <li>Performance issue → check X-Ray</li>
+                    <li>Compliance check → AWS Config</li>
+                    <li>Secrets needing rotation → Secrets Manager</li>
+                    <li>Static config/params → SSM Parameter Store</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>Encryption Headers (S3)</h3>
+                <ul>
+                    <li>SSE-S3: <code>x-amz-server-side-encryption: AES256</code></li>
+                    <li>SSE-KMS: <code>x-amz-server-side-encryption: aws:kms</code></li>
+                    <li>SSE-C: key in every request header, HTTPS required</li>
+                </ul>
+            </div>
+        </div>
+        <h3>Deployment Strategy Comparison</h3>
+        <table>
+            <tr><th>Strategy</th><th>Downtime</th><th>Rollback Speed</th><th>Cost</th></tr>
+            <tr><td>All at Once (EB)</td><td>Yes</td><td>Slow (redeploy)</td><td>None</td></tr>
+            <tr><td>Rolling (EB)</td><td>Partial</td><td>Slow</td><td>None</td></tr>
+            <tr><td>Rolling + Batch (EB)</td><td>No</td><td>Slow</td><td>Small</td></tr>
+            <tr><td>Immutable (EB)</td><td>No</td><td>Fast (terminate ASG)</td><td>2x</td></tr>
+            <tr><td>Blue/Green (EB/CodeDeploy)</td><td>No</td><td>Fast (swap URL)</td><td>2x</td></tr>
+            <tr><td>Canary (Lambda/CodeDeploy)</td><td>No</td><td>Fast</td><td>Normal</td></tr>
+            <tr><td>Linear (Lambda/CodeDeploy)</td><td>No</td><td>Fast</td><td>Normal</td></tr>
+        </table>
+    </section>
+
+</main>
+
+<script>
+    // Highlight active nav link on scroll
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('nav a');
+    window.addEventListener('scroll', () => {
+        let current = '';
+        sections.forEach(s => { if (window.scrollY >= s.offsetTop - 80) current = s.id; });
+        navLinks.forEach(a => {
+            a.classList.toggle('active', a.getAttribute('href') === '#' + current);
+        });
+    });
+</script>
+</body>
+</html>

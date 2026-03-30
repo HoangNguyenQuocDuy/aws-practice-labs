@@ -1,0 +1,1828 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS DVA-C02 — Supplemental Labs (Gap Coverage)</title>
+    <style>
+        :root{
+            --bg:#0f1117;--surface:#1a1d27;--card:#21253a;--border:#2e3350;
+            --accent:#ff9900;--accent2:#00c7b7;--accent3:#7c6af7;
+            --text:#e8eaf0;--muted:#8b92a8;
+            --green:#2ecc71;--red:#e74c3c;--yellow:#f39c12;--blue:#3498db;
+            --java:#f89820;--spring:#6db33f;
+        }
+        *{box-sizing:border-box;margin:0;padding:0;}
+        body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;font-size:14px;line-height:1.65;}
+
+        nav{position:fixed;top:0;left:0;width:235px;height:100vh;background:var(--surface);border-right:1px solid var(--border);overflow-y:auto;padding:10px 0;z-index:100;}
+        nav .logo{padding:10px 14px 12px;border-bottom:1px solid var(--border);margin-bottom:6px;}
+        nav .logo .title{color:var(--accent);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;}
+        nav .logo .sub{color:var(--muted);font-size:11px;margin-top:2px;}
+        nav .cat{font-size:10px;color:var(--accent3);text-transform:uppercase;letter-spacing:1px;padding:8px 14px 2px;font-weight:700;}
+        nav a{display:block;padding:5px 14px;color:var(--muted);font-size:12px;border-left:3px solid transparent;text-decoration:none;transition:all .15s;}
+        nav a:hover,nav a.active{color:var(--text);border-left-color:var(--accent);background:rgba(255,153,0,.06);}
+
+        main{margin-left:235px;padding:26px 34px;max-width:1100px;}
+
+        .hero{background:linear-gradient(135deg,#1a1d27,#21253a);border:1px solid var(--border);border-radius:10px;padding:24px 28px;margin-bottom:24px;}
+        .hero h1{font-size:22px;color:var(--accent);margin-bottom:8px;}
+        .hero p{color:var(--muted);font-size:13px;line-height:1.6;}
+        .gap-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin-top:14px;}
+        .gap-badge{background:rgba(231,76,60,.1);border:1px solid rgba(231,76,60,.3);border-radius:6px;padding:6px 10px;font-size:11px;color:var(--red);}
+        .gap-badge.done{background:rgba(46,204,113,.1);border-color:rgba(46,204,113,.3);color:var(--green);}
+
+        .lab{background:var(--card);border:1px solid var(--border);border-radius:10px;margin-bottom:22px;overflow:hidden;}
+        .lab-header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;}
+        .lab-header:hover{background:rgba(255,255,255,.02);}
+        .lab-num{background:var(--accent);color:#000;font-weight:700;font-size:11px;padding:2px 8px;border-radius:20px;white-space:nowrap;}
+        .lab-title{font-size:14px;font-weight:600;flex:1;}
+        .tag{font-size:10px;padding:2px 7px;border-radius:10px;font-weight:600;text-transform:uppercase;}
+        .tag.blue{background:rgba(52,152,219,.2);color:var(--blue);}
+        .tag.green{background:rgba(46,204,113,.2);color:var(--green);}
+        .tag.orange{background:rgba(255,153,0,.2);color:var(--accent);}
+        .tag.purple{background:rgba(124,106,247,.2);color:var(--accent3);}
+        .tag.red{background:rgba(231,76,60,.2);color:var(--red);}
+        .tag.teal{background:rgba(0,199,183,.2);color:var(--accent2);}
+        .tag.java{background:rgba(248,152,32,.2);color:var(--java);}
+        .tag.spring{background:rgba(109,179,63,.2);color:var(--spring);}
+        .chevron{color:var(--muted);font-size:14px;transition:transform .2s;}
+        .lab.open .chevron{transform:rotate(180deg);}
+        .lab-body{display:none;padding:18px 22px;}
+        .lab.open .lab-body{display:block;}
+
+        h3{font-size:13px;color:var(--accent2);margin:16px 0 8px;}
+        h3:first-child{margin-top:0;}
+        h4{font-size:12px;color:var(--yellow);margin:10px 0 5px;}
+        p{margin:5px 0;font-size:13px;}
+        ul,ol{padding-left:18px;margin:5px 0;}
+        li{margin:3px 0;font-size:13px;}
+
+        /* CONSOLE STEPS — numbered UI walkthrough */
+        .ui-steps{counter-reset:ui;}
+        .ui-step{counter-increment:ui;background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:12px 14px 12px 46px;margin:7px 0;position:relative;}
+        .ui-step::before{content:counter(ui);position:absolute;left:12px;top:12px;background:var(--accent);color:#000;font-weight:700;font-size:11px;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;}
+        .ui-step .nav-path{font-size:11px;color:var(--accent);font-weight:600;margin-bottom:4px;}
+        .ui-step .action{font-size:13px;color:var(--text);margin-bottom:4px;}
+        .ui-step .field{display:flex;gap:8px;align-items:baseline;margin:3px 0;font-size:12px;}
+        .ui-step .field .label{color:var(--muted);min-width:160px;}
+        .ui-step .field .val{color:var(--accent2);font-family:'Consolas',monospace;}
+        .ui-step .field .val.warn{color:var(--yellow);}
+        .ui-step .field .val.imp{color:var(--red);font-weight:600;}
+        .ui-step .screenshot-note{background:#0d1117;border:1px solid var(--border);border-radius:4px;padding:6px 10px;margin-top:6px;font-size:11px;color:var(--muted);}
+
+        /* CODE */
+        pre{background:#0d1117;border:1px solid var(--border);border-radius:5px;padding:12px 14px;overflow-x:auto;margin:7px 0;}
+        pre code{color:#e6edf3;font-family:'Consolas','Courier New',monospace;font-size:12px;}
+        code{background:#0d1117;color:#79c0ff;padding:1px 5px;border-radius:3px;font-family:'Consolas',monospace;font-size:12px;}
+
+        /* TIPS */
+        .tip{border-left:4px solid var(--accent);background:rgba(255,153,0,.07);padding:8px 12px;border-radius:0 5px 5px 0;margin:7px 0;font-size:12.5px;}
+        .tip.blue{border-left-color:var(--blue);background:rgba(52,152,219,.07);}
+        .tip.green{border-left-color:var(--green);background:rgba(46,204,113,.07);}
+        .tip.red{border-left-color:var(--red);background:rgba(231,76,60,.07);}
+        .tip.purple{border-left-color:var(--accent3);background:rgba(124,106,247,.07);}
+        .tip strong{color:var(--accent);}
+        .tip.blue strong{color:var(--blue);}
+        .tip.green strong{color:var(--green);}
+        .tip.red strong{color:var(--red);}
+        .tip.purple strong{color:var(--accent3);}
+
+        .verify{background:rgba(46,204,113,.06);border:1px solid rgba(46,204,113,.2);border-radius:6px;padding:10px 12px;margin:8px 0;}
+        .verify h4{color:var(--green);margin-top:0;}
+        .exam-box{background:rgba(124,106,247,.07);border:1px solid rgba(124,106,247,.2);border-radius:6px;padding:10px 12px;margin:8px 0;}
+        .exam-box h4{color:var(--accent3);margin-top:0;}
+
+        /* DIAGRAM */
+        .diagram{background:#0d1117;border:1px solid var(--border);border-radius:8px;padding:14px;margin:10px 0;overflow-x:auto;text-align:center;}
+
+        table{width:100%;border-collapse:collapse;margin:7px 0;font-size:12.5px;}
+        th{background:var(--surface);color:var(--accent);text-align:left;padding:6px 10px;border:1px solid var(--border);}
+        td{padding:5px 10px;border:1px solid var(--border);vertical-align:top;}
+        tr:nth-child(even) td{background:rgba(255,255,255,.02);}
+
+        .two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:8px 0;}
+        @media(max-width:860px){nav{display:none;}main{margin-left:0;padding:12px;}.two-col{grid-template-columns:1fr;}}
+    </style>
+</head>
+<body>
+<nav>
+    <div class="logo">
+        <div class="title">DVA-C02 Supplemental</div>
+        <div class="sub">Gap Coverage + Console UI Steps</div>
+    </div>
+    <div class="cat">Serverless</div>
+    <a href="#slab1">Lab 1 — AWS SAM Full Deploy</a>
+    <a href="#slab2">Lab 2 — S3 → Lambda Events</a>
+    <a href="#slab3">Lab 3 — Step Functions</a>
+    <div class="cat">API & Web</div>
+    <a href="#slab4">Lab 4 — API GW Advanced</a>
+    <a href="#slab5">Lab 5 — CloudFront + OAI</a>
+    <div class="cat">Compute</div>
+    <a href="#slab6">Lab 6 — Elastic Beanstalk</a>
+    <div class="cat">Database</div>
+    <a href="#slab7">Lab 7 — RDS IAM Auth + Proxy</a>
+    <a href="#slab8">Lab 8 — Aurora Serverless</a>
+    <div class="cat">SDK & Auth</div>
+    <a href="#slab9">Lab 9 — SDK in Lambda + STS</a>
+    <div class="cat">Monitoring</div>
+    <a href="#slab10">Lab 10 — CW Alarms + Insights</a>
+    <div class="cat">Networking</div>
+    <a href="#slab11">Lab 11 — VPC + Lambda + Endpoints</a>
+    <div class="cat">Compliance</div>
+    <a href="#slab12">Lab 12 — AWS Config Rules</a>
+</nav>
+
+<main>
+    <div class="hero">
+        <h1>DVA-C02 Supplemental Labs — Gap Coverage</h1>
+        <p>12 labs covering every topic missing from previous files. Each lab includes detailed AWS Console UI walkthrough steps (click-by-click), architecture diagrams, Java code, and exam insights.</p>
+        <div class="gap-grid">
+            <div class="gap-badge done">✅ AWS SAM</div>
+            <div class="gap-badge done">✅ Elastic Beanstalk</div>
+            <div class="gap-badge done">✅ Step Functions</div>
+            <div class="gap-badge done">✅ S3 → Lambda Events</div>
+            <div class="gap-badge done">✅ CloudFront + OAI</div>
+            <div class="gap-badge done">✅ API GW Advanced</div>
+            <div class="gap-badge done">✅ RDS IAM Auth + Proxy</div>
+            <div class="gap-badge done">✅ Aurora Serverless</div>
+            <div class="gap-badge done">✅ SDK + STS Credentials</div>
+            <div class="gap-badge done">✅ CloudWatch Alarms</div>
+            <div class="gap-badge done">✅ VPC + Lambda + Endpoints</div>
+            <div class="gap-badge done">✅ AWS Config Rules</div>
+        </div>
+    </div>
+
+    <!-- ===================== LAB 1: SAM ===================== -->
+    <div class="lab" id="slab1">
+        <div class="lab-header" onclick="toggle(this)">
+            <span class="lab-num">Lab 1</span>
+            <span class="lab-title">AWS SAM — Full Serverless App: Lambda + API Gateway + DynamoDB</span>
+            <div style="display:flex;gap:6px"><span class="tag orange">SAM</span><span class="tag green">Lambda</span><span class="tag blue">API GW</span><span class="tag teal">DynamoDB</span></div>
+            <span class="chevron">▼</span>
+        </div>
+        <div class="lab-body">
+            <p>SAM (Serverless Application Model) is a CloudFormation extension that simplifies serverless deployments. It appears frequently on the DVA-C02 exam. This lab covers the full lifecycle: write → test locally → deploy → traffic shift.</p>
+
+            <h3>🏗️ Architecture</h3>
+            <div class="diagram">
+                <svg width="680" height="130" viewBox="0 0 680 130" xmlns="http://www.w3.org/2000/svg">
+                    <defs><marker id="a1" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#ff9900"/></marker></defs>
+                    <rect x="10" y="40" width="100" height="50" rx="6" fill="#1a2332" stroke="#7c6af7" stroke-width="1.5"/>
+                    <text x="60" y="62" text-anchor="middle" fill="#7c6af7" font-size="10" font-weight="bold">SAM Template</text>
+                    <text x="60" y="77" text-anchor="middle" fill="#8b9ab0" font-size="9">template.yaml</text>
+                    <line x1="110" y1="65" x2="148" y2="65" stroke="#ff9900" stroke-width="1.5" marker-end="url(#a1)"/>
+                    <text x="129" y="58" text-anchor="middle" fill="#ff9900" font-size="8">sam deploy</text>
+                    <rect x="148" y="40" width="100" height="50" rx="6" fill="#1a2332" stroke="#ff9900" stroke-width="1.5"/>
+                    <text x="198" y="62" text-anchor="middle" fill="#ff9900" font-size="10" font-weight="bold">CloudFormation</text>
+                    <text x="198" y="77" text-anchor="middle" fill="#8b9ab0" font-size="9">Stack created</text>
+                    <line x1="248" y1="65" x2="286" y2="65" stroke="#ff9900" stroke-width="1.5" marker-end="url(#a1)"/>
+                    <rect x="286" y="25" width="90" height="35" rx="5" fill="#1a2332" stroke="#ff9900" stroke-width="1.5"/>
+                    <text x="331" y="47" text-anchor="middle" fill="#ff9900" font-size="9">API Gateway</text>
+                    <rect x="286" y="70" width="90" height="35" rx="5" fill="#1a2332" stroke="#ff9900" stroke-width="1.5"/>
+                    <text x="331" y="92" text-anchor="middle" fill="#ff9900" font-size="9">Lambda Fn</text>
+                    <rect x="286" y="115" width="90" height="10" rx="3" fill="#1a2332" stroke="#3498db" stroke-width="1"/>
+                    <text x="331" y="123" text-anchor="middle" fill="#3498db" font-size="8">DynamoDB</text>
+                    <line x1="376" y1="42" x2="420" y2="42" stroke="#ff9900" stroke-width="1.5" marker-end="url(#a1)"/>
+                    <line x1="376" y1="87" x2="420" y2="87" stroke="#ff9900" stroke-width="1.5" marker-end="url(#a1)"/>
+                    <rect x="420" y="25" width="110" height="80" rx="6" fill="#1a2332" stroke="#2ecc71" stroke-width="1.5"/>
+                    <text x="475" y="48" text-anchor="middle" fill="#2ecc71" font-size="10" font-weight="bold">Deployed App</text>
+                    <text x="475" y="63" text-anchor="middle" fill="#8b9ab0" font-size="9">https://abc.execute-api</text>
+                    <text x="475" y="78" text-anchor="middle" fill="#8b9ab0" font-size="9">.amazonaws.com/prod</text>
+                    <text x="340" y="18" text-anchor="middle" fill="#ff9900" font-size="11" font-weight="bold">SAM → CloudFormation → AWS Resources</text>
+                </svg>
+            </div>
+
+            <h3>📋 SAM Template (template.yaml)</h3>
+            <pre><code>AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'   # ← REQUIRED: marks this as SAM
+
+Globals:                                   # Applied to all functions
+  Function:
+    Timeout: 30
+    Runtime: java17
+    MemorySize: 512
+    Environment:
+      Variables:
+        TABLE_NAME: !Ref OrdersTable
+        JAVA_TOOL_OPTIONS: "-XX:+TieredCompilation -XX:TieredStopAtLevel=1"
+
+Resources:
+
+  # Lambda Function with API Gateway trigger
+  OrdersFunction:
+    Type: AWS::Serverless::Function        # SAM resource type
+    Properties:
+      Handler: com.myapp.OrderHandler::handleRequest
+      CodeUri: target/orders-1.0.jar
+      Policies:
+        - DynamoDBCrudPolicy:              # SAM policy template (shorthand)
+            TableName: !Ref OrdersTable
+      AutoPublishAlias: live               # Auto-publish version + create alias
+      DeploymentPreference:               # CodeDeploy traffic shifting
+        Type: Canary10Percent5Minutes     # 10% for 5 min, then 100%
+        Alarms:
+          - !Ref OrdersFunctionErrorAlarm
+      Events:
+        GetOrders:
+          Type: Api
+          Properties:
+            Path: /orders
+            Method: GET
+        CreateOrder:
+          Type: Api
+          Properties:
+            Path: /orders
+            Method: POST
+        # S3 trigger
+        ProcessUpload:
+          Type: S3
+          Properties:
+            Bucket: !Ref UploadBucket
+            Events: s3:ObjectCreated:*
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: suffix
+                    Value: .jpg
+
+  # DynamoDB Table
+  OrdersTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey:
+        Name: orderId
+        Type: String
+      BillingMode: PAY_PER_REQUEST
+
+  # S3 Bucket for uploads
+  UploadBucket:
+    Type: AWS::S3::Bucket
+
+  # CloudWatch Alarm for canary rollback
+  OrdersFunctionErrorAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: OrdersFunctionErrors
+      MetricName: Errors
+      Namespace: AWS/Lambda
+      Statistic: Sum
+      Period: 60
+      EvaluationPeriods: 1
+      Threshold: 5
+      ComparisonOperator: GreaterThanThreshold
+      Dimensions:
+        - Name: FunctionName
+          Value: !Ref OrdersFunction
+
+Outputs:
+  ApiUrl:
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+  TableName:
+    Value: !Ref OrdersTable</code></pre>
+
+            <h3>🖥️ Console UI — Deploy via SAM CLI (Step by Step)</h3>
+            <div class="ui-steps">
+                <div class="ui-step">
+                    <div class="nav-path">Terminal — Install SAM CLI</div>
+                    <div class="action">Install AWS SAM CLI (one-time setup)</div>
+                    <pre><code># macOS
+brew install aws-sam-cli
+
+# Windows (via MSI installer or pip)
+pip install aws-sam-cli
+
+# Verify
+sam --version</code></pre>
+                </div>
+                <div class="ui-step">
+                    <div class="nav-path">Terminal — Build</div>
+                    <div class="action">Build the application (compiles Java, packages dependencies)</div>
+                    <pre><code>sam build
+# Creates .aws-sam/build/ directory with packaged artifacts</code></pre>
+                </div>
+                <div class="ui-step">
+                    <div class="nav-path">Terminal — Local Test</div>
+                    <div class="action">Test Lambda locally before deploying (requires Docker)</div>
+                    <pre><code># Invoke function with test event
+sam local invoke OrdersFunction --event events/create-order.json
+
+# Start local API Gateway
+sam local start-api
+# Test: curl http://localhost:3000/orders</code></pre>
+                </div>
+                <div class="ui-step">
+                    <div class="nav-path">Terminal — Deploy (guided first time)</div>
+                    <div class="action">Deploy to AWS — guided mode creates samconfig.toml for future deploys</div>
+                    <pre><code>sam deploy --guided
+
+# Prompts:
+# Stack Name: my-orders-app
+# AWS Region: us-east-1
+# Confirm changes before deploy: Y
+# Allow SAM CLI IAM role creation: Y
+# Save arguments to samconfig.toml: Y</code></pre>
+                </div>
+                <div class="ui-step">
+                    <div class="nav-path">AWS Console → CloudFormation → Stacks → my-orders-app</div>
+                    <div class="action">Verify stack was created successfully</div>
+                    <div class="field"><span class="label">Status should show:</span><span class="val">CREATE_COMPLETE</span></div>
+                    <div class="field"><span class="label">Outputs tab shows:</span><span class="val">ApiUrl = https://abc123.execute-api.us-east-1.amazonaws.com/Prod/</span></div>
+                    <div class="screenshot-note">📸 Console: CloudFormation → Stacks → my-orders-app → Events tab shows all resources created in order</div>
+                </div>
+                <div class="ui-step">
+                    <div class="nav-path">Terminal — Subsequent deploys</div>
+                    <div class="action">After first deploy, just run:</div>
+                    <pre><code>sam build && sam deploy
+# Uses saved samconfig.toml — no prompts needed</code></pre>
+                </div>
+            </div>
+
+            <h3>🖥️ Console UI — View SAM-Deployed Lambda</h3>
+            <div class="ui-steps">
+                <div class="ui-step">
+                    <div class="nav-path">AWS Console → Lambda → Functions</div>
+                    <div class="action">Find your SAM-deployed function</div>
+                    <div class="field"><span class="label">Function name:</span><span class="val">my-orders-app-OrdersFunction-XXXX</span></div>
+                    <div class="field"><span class="label">Aliases tab shows:</span><span class="val">live → version 1 (100%) or canary split</span></div>
+                    <div class="screenshot-note">📸 Console: Lambda → Function → Aliases → "live" alias shows weighted routing during canary deployment</div>
+                </div>
+            </div>
+
+            <div class="exam-box">
+                <h4>🎓 Exam Insights — SAM</h4>
+                <ul>
+                    <li>Transform header <code>AWS::Serverless-2016-10-31</code> is MANDATORY — identifies SAM template</li>
+                    <li>SAM resource types: <code>AWS::Serverless::Function</code>, <code>::Api</code>, <code>::SimpleTable</code>, <code>::Application</code></li>
+                    <li>SAM generates CloudFormation under the hood — all CF features work</li>
+                    <li><code>sam local invoke</code> and <code>sam local start-api</code> require Docker</li>
+                    <li>DeploymentPreference + CodeDeploy = automatic canary/linear traffic shifting with rollback on alarm</li>
+                    <li><code>sam publish</code> = publish to AWS Serverless Application Repository</li>
+                    <li>Policy templates (e.g., <code>DynamoDBCrudPolicy</code>) are SAM shorthand for common IAM policies</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== LAB 2: S3 Events ===================== -->
+    <div class="lab" id="slab2">
+        <div class="lab-header" onclick="toggle(this)">
+            <span class="lab-num">Lab 2</span>
+            <span class="lab-title">S3 Event Notifications → Lambda — Image Processing Pipeline</span>
+            <div style="display:flex;gap:6px"><span class="tag teal">S3</span><span class="tag green">Lambda</span><span class="tag java">Java</span></div>
+            <span class="chevron">▼</span>
+        </div>
+        <div class="lab-body">
+            <p>The most common S3+Lambda pattern on the exam: upload an image → S3 triggers Lambda → Lambda processes and stores result. Covers async invocation, event structure, and filtering.</p>
+
+            <h3>🏗️ Architecture</h3>
+            <div class="diagram">
+                <svg width="680" height="140" viewBox="0 0 680 140" xmlns="http://www.w3.org/2000/svg">
+                    <defs><marker id="a2" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#ff9900"/></marker></defs>
+                    <rect x="10" y="50" width="90" height="50" rx="6" fill="#1a2332" stroke="#2e3f52" stroke-width="1.5"/>
+                    <text x="55" y="72" text-anchor="middle" fill="#e8eaf0" font-size="9" font-weight="bold">User Upload</text>
+                    <text x="55" y="87" text-anchor="middle" fill="#8b9ab0" font-size="8">PUT image.jpg</text>
+                    <line x1="100" y1="75" x2="138" y2="75" stroke="#ff9900" stroke-width="1.5" marker-end="url(#a2)"/>
+                    <rect x="138" y="40" width="110" height="70" rx="6" fill="#1a2332" stroke="#00c7b7" stroke-width="2"/>
+                    <text x="193" y="63" text-anchor="middle" fill="#00c7b7" font-size="10" font-weight="bold">S3 Source</text>
+                    <text x="193" y="78" text-anchor="middle" fill="#8b9ab0" font-size="9">uploads-bucket</text>
+                    <text x="193" y="93" text-anchor="middle" fill="#2ecc71" font-size="8">Filter: *.jpg, *.png</text>
+                    <line x1="248" y1="75" x2="286" y2="75" stroke="#ff9900" stroke-width="1.5" marker-end="url(#a2)"/>
+                    <text x="267" y="68" text-anchor="middle" fill="#ff9900" font-size="8">Async event</text>
+                    <rect x="286" y="40" width="110" height="70" rx="6" fill="#1a2332" stroke="#ff9900" stroke-width="2"/>
+                    <text x="341" y="63" text-anchor="middle" fill="#ff9900" font-size="10" font-weight="bold">Lambda</text>
+                    <text x="341" y="78" text-anchor="middle" fill="#8b9ab0" font-size="9">image-processor</text>
+                    <text x="341" y="93" text-anchor="middle" fill="#8b9ab0" font-size="8">Resize + thumbnail</text>
+                    <line x1="396" y1="65" x2="434" y2="50" stroke="#ff9900" stroke-width="1.5" marker-end="url(#a2)"/>
+                    <line x1="396" y1="85" x2="434" y2="100" stroke="#ff9900" stroke-width="1.5" marker-end="url(#a2)"/>
+                    <rect x="434" y="30" width="100" height="35" rx="5" fill="#1a2332" stroke="#00c7b7" stroke-width="1.5"/>
+                    <text x="484" y="52" text-anchor="middle" fill="#00c7b7" font-size="9">S3 Thumbnails</text>
+                    <rect x="434" y="85" width="100" height="35" rx="5" fill="#1a2332" stroke="#3498db" stroke-width="1.5"/>
+                    <text x="484" y="107" text-anchor="middle" fill="#3498db" font-size="9">DynamoDB Metadata</text>
+                    <text x="340" y="18" text-anchor="middle" fill="#ff9900" font-size="11" font-weight="bold">S3 Event → Lambda (Async) → Process → Store</text>
+                    <text x="340" y="128" text-anchor="middle" fill="#e74c3c" font-size="9">⚠ S3 invokes Lambda ASYNC — 3 retries, then DLQ on Lambda function</text>
+                </svg>
+            </div>
+
+            <h3>🖥️ Console UI — Configure S3 Event Notification</h3>
+            <div class="ui-steps">
+                <div class="ui-step">
+                    <div class="nav-path">AWS Console → S3 → uploads-bucket → Properties tab</div>
+                    <div class="action">Scroll down to "Event notifications" section → Click "Create event notification"</div>
+                    <div class="field"><span class="label">Event name:</span><span class="val">ImageUploadTrigger</span></div>
+                </div>
+                <div class="ui-step">
+                    <div class="nav-path">Event notification → Prefix/Suffix filters</div>
+                    <div class="action">Add object key filters to only trigger on image files</div>
+                    <div class="field"><span class="label">Prefix:</span><span class="val">uploads/</span></div>
+                    <div class="field"><span class="label">Suffix:</span><span class="val">.jpg</span></div>
+                    <div class="screenshot-note">📸 You can add multiple suffix filters. Add separate notifications for .png, .gif etc.</div>
+                </div>
+                <div class="ui-step">
+                    <div class="nav-path">Event notification → Event types</div>
+                    <div class="action">Select which S3 operations trigger the notification</div>
+                    <div class="field"><span class="label">Check:</span><span class="val">s3:ObjectCreated:Put</span></div>
+                    <div class="field"><span class="label">Also check:</span><span class="val">s3:ObjectCreated:CompleteMultipartUpload</span></div>
+                </div>
+                <div class="ui-step">
+                    <div class="nav-path">Event notification → Destination</div>
+                    <div class="action">Choose Lambda function as destination</div>
+                    <div class="field"><span class="label">Destination type:</span><span class="val">Lambda function</span></div>
+                    <div class="field"><span class="label">Lambda function:</span><span class="val">image-processor</span></div>
+                    <div class="field"><span class="label">Click:</span><span class="val imp">Save changes</span></div>
+                    <div class="screenshot-note">📸 S3 will automatically add a resource-based policy to Lambda allowing s3.amazonaws.com to invoke it</div>
+                </div>
+                <div class="ui-step">
+                    <div class="nav-path">AWS Console → Lambda → image-processor → Configuration → Triggers</div>
+                    <div class="action">Verify the S3 trigger appears</div>
+                    <div class="field"><span class="label">Should show:</span><span class="val">S3: uploads-bucket (ObjectCreated)</span></div>
+                </div>
+                <div class="ui-step">
+                    <div class="nav-path">Lambda → image-processor → Configuration → Asynchronous invocation</div>
+                    <div class="action">Configure DLQ for failed async invocations</div>
+                    <div class="field"><span class="label">On failure destination:</span><span class="val">SQS queue: image-processing-dlq</span></div>
+                    <div class="field"><span class="label">Retry attempts:</span><span class="val">2 (default)</span></div>
+                    <div class="screenshot-note">📸 For S3-triggered Lambda (async), DLQ goes on the LAMBDA function, not on S3</div>
+                </div>
+            </div>
+
+            <h3>☕ Java Lambda Handler — S3 Event</h3>
+            <pre><code>public class ImageProcessor implements RequestHandler&lt;S3Event, Void&gt; {
+
+    private static final S3Client s3 = S3Client.create();
+
+    @Override
+    public Void handleRequest(S3Event event, Context context) {
+        for (S3EventNotification.S3EventNotificationRecord record : event.getRecords()) {
+            String bucket = record.getS3().getBucket().getName();
+            // URL-decode the key (S3 encodes spaces as +)
+            String key = record.getS3().getObject().getUrlDecodedKey();
+            long size = record.getS3().getObject().getSizeAsLong();
+
+            context.getLogger().log("Processing: s3://" + bucket + "/" + key + " (" + size + " bytes)");
+
+            // Download original image
+            ResponseBytes&lt;GetObjectResponse&gt; original = s3.getObjectAsBytes(r -> r
+                .bucket(bucket).key(key));
+
+            // Process (resize, thumbnail, etc.)
+            byte[] thumbnail = createThumbnail(original.asByteArray(), 150, 150);
+
+            // Upload thumbnail to different bucket/prefix
+            String thumbnailKey = "thumbnails/" + key;
+            s3.putObject(r -> r
+                .bucket("thumbnails-bucket")
+                .key(thumbnailKey)
+                .contentType("image/jpeg"),
+                RequestBody.fromBytes(thumbnail));
+
+            context.getLogger().log("Thumbnail created: " + thumbnailKey);
+        }
+        return null;
+    }
+}</code></pre>
+
+            <div class="tip red"><strong>S3 → Lambda is ASYNC invocation.</strong> DLQ goes on the Lambda function (not S3). Lambda retries 3 times (0min, 1min, 2min) before sending to DLQ.</div>
+            <div class="tip"><strong>Two writes to same non-versioned object simultaneously</strong> may only deliver one event. Solution: enable versioning on the S3 bucket.</div>
+
+            <div class="exam-box">
+                <h4>🎓 Exam Insights</h4>
+                <ul>
+                    <li>S3 → Lambda = async invocation. 3 retries. DLQ on Lambda function.</li>
+                    <li>S3 event notifications can also go to SQS or SNS (not just Lambda)</li>
+                    <li>Object key filter: prefix (folder path) + suffix (file extension)</li>
+                    <li>Enable S3 versioning to guarantee one event per write</li>
+                    <li>S3 Object Lambda: transform data on-the-fly when reading (not on upload)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== LAB 3: STEP FUNCTIONS ===================== -->
+    <div class="lab" id="slab3">
+        <div class="lab-header" onclick="toggle(this)">
+            <span class="lab-num">Lab 3</span>
+            <span class="lab-title">Step Functions — Order Workflow with Retry, Catch & Human Approval</span>
+            <div style="display:flex;gap:6px"><span class="tag purple">Step Functions</span><span class="tag green">Lambda</span></div>
+            <span class="chevron">▼</span>
+        </div>
+        <div class="lab-body">
+            <h3>🖥️ Console UI — Create State Machine</h3>
+            <div class="ui-steps">
+                <div class="ui-step">
+                    <div class="nav-path">AWS Console → Step Functions → State machines → Create state machine</div>
+                    <div class="action">Choose authoring method</div>
+                    <div class="field"><span class="label">Choose:</span><span class="val">Write your workflow in code</span></div>
+                    <div class="field"><span class="label">Type:</span><span class="val warn">Standard (for long-running, auditable workflows)</span></div>
+                    <div class="screenshot-note">📸 Standard = max 1 year, exactly-once, $0.025/1000 state transitions. Express = max 5 min, at-least-once, cheaper for high-volume.</div>
+                </div>
+                <div class="ui-step">
+                    <div class="nav-path">State machine → Definition tab</div>
+                    <div class="action">Paste the ASL (Amazon States Language) JSON definition below</div>
+                </div>
+                <div class="ui-step">
+                    <div class="nav-path">State machine → Configuration</div>
+                    <div class="action">Set execution role</div>
+                    <div class="field"><span class="label">Execution role:</span><span class="val">Create new role (auto-generates with Lambda invoke permissions)</span></div>
+                    <div class="field"><span class="label">Name:</span><span class="val">OrderProcessingWorkflow</span></div>
+                    <div class="field"><span class="label">Click:</span><span class="val imp">Create state machine</span></div>
+                </div>
+                <div class="ui-step">
+                    <div class="nav-path">State machine → Start execution</div>
+                    <div class="action">Test with a sample input</div>
+                    <pre><code>{
+  "orderId": "order-001",
+  "customerId": "cust-123",
+  "amount": 99.99,
+  "items": [{"sku": "PROD-1", "qty": 2}]
+}</code></pre>
+                    <div class="screenshot-note">📸 The visual workflow diagram shows each state highlighted in real-time as execution progresses</div>
+                </div>
+            </div>
+
+            <h3>📋 State Machine Definition (ASL)</h3>
+            <pre><code>{
+  "Comment": "Order Processing Workflow",
+  "StartAt": "ValidateOrder",
+  "States": {
+
+    "ValidateOrder": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-east-1:ACCOUNT:function:validate-order",
+      "Retry": [
+        {
+          "ErrorEquals": ["Lambda.ServiceException", "Lambda.TooManyRequestsException"],
+          "IntervalSeconds": 2,
+          "MaxAttempts": 3,
+          "BackoffRate": 2.0
+        }
+      ],
+      "Catch": [
+        {
+          "ErrorEquals": ["ValidationError"],
+          "Next": "OrderRejected",
+          "ResultPath": "$.error"
+        },
+        {
+          "ErrorEquals": ["States.ALL"],
+          "Next": "OrderFailed",
+          "ResultPath": "$.error"
+        }
+      ],
+      "Next": "CheckInventoryAndCharge"
+    },
+
+    "CheckInventoryAndCharge": {
+      "Type": "Parallel",
+      "Branches": [
+        {
+          "StartAt": "CheckInventory",
+          "States": {
+            "CheckInventory": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:us-east-1:ACCOUNT:function:check-inventory",
+              "End": true
+            }
+          }
+        },
+        {
+          "StartAt": "ChargePayment",
+          "States": {
+            "ChargePayment": {
+              "Type": "Task",
+              "Resource": "arn:aws:lambda:us-east-1:ACCOUNT:function:charge-payment",
+              "End": true
+            }
+          }
+        }
+      ],
+      "Next": "IsHighValueOrder"
+    },
+
+    "IsHighValueOrder": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Variable": "$.amount",
+          "NumericGreaterThan": 500,
+          "Next": "WaitForManagerApproval"
+        }
+      ],
+      "Default": "ShipOrder"
+    },
+
+    "WaitForManagerApproval": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::lambda:invoke.waitForTaskToken",
+      "Parameters": {
+        "FunctionName": "send-approval-email",
+        "Payload": {
+          "taskToken.$": "$$.Task.Token",
+          "orderId.$": "$.orderId",
+          "amount.$": "$.amount"
+        }
+      },
+      "HeartbeatSeconds": 3600,
+      "TimeoutSeconds": 86400,
+      "Next": "ShipOrder"
+    },
+
+    "ShipOrder": {
+      "Type": "Task",
+      "Resource": "arn:aws:lambda:us-east-1:ACCOUNT:function:ship-order",
+      "Next": "OrderComplete"
+    },
+
+    "OrderComplete": {
+      "Type": "Succeed"
+    },
+
+    "OrderRejected": {
+      "Type": "Fail",
+      "Error": "ValidationFailed",
+      "Cause": "Order did not pass validation checks"
+    },
+
+    "OrderFailed": {
+      "Type": "Fail",
+      "Error": "ProcessingFailed",
+      "Cause": "Unexpected error during order processing"
+    }
+  }
+}</code></pre>
+
+            <h3>☕ Java — Human Approval Callback (WaitForTaskToken)</h3>
+            <pre><code>// Lambda that sends approval email and stores task token
+public class SendApprovalEmail implements RequestHandler&lt;Map&lt;String, Object&gt;, Void&gt; {
+
+    private static final SfnClient sfn = SfnClient.create();
+    private static final DynamoDbClient ddb = DynamoDbClient.create();
+
+    @Override
+    public Void handleRequest(Map&lt;String, Object&gt; event, Context context) {
+        String taskToken = (String) event.get("taskToken");
+        String orderId = (String) event.get("orderId");
+
+        // Store task token in DynamoDB so manager can retrieve it
+        ddb.putItem(r -> r.tableName("PendingApprovals").item(Map.of(
+            "orderId", AttributeValue.fromS(orderId),
+            "taskToken", AttributeValue.fromS(taskToken),
+            "expiresAt", AttributeValue.fromN(
+                String.valueOf(Instant.now().plusSeconds(86400).getEpochSecond()))
+        )));
+
+        // Send email to manager with approve/reject links
+        sendApprovalEmail(orderId, taskToken);
+        return null;
+    }
+}
+
+// Manager clicks "Approve" → this endpoint is called
+@PostMapping("/orders/{orderId}/approve")
+public ResponseEntity&lt;Void&gt; approveOrder(@PathVariable String orderId) {
+    // Retrieve task token from DynamoDB
+    String taskToken = getTaskToken(orderId);
+
+    // Send success callback to Step Functions — workflow resumes!
+    sfn.sendTaskSuccess(r -> r
+        .taskToken(taskToken)
+        .output("{\"approved\": true, \"approvedBy\": \"manager@company.com\"}"));
+
+    return ResponseEntity.ok().build();
+}
+
+// Manager clicks "Reject"
+@PostMapping("/orders/{orderId}/reject")
+public ResponseEntity&lt;Void&gt; rejectOrder(@PathVariable String orderId, @RequestBody String reason) {
+    String taskToken = getTaskToken(orderId);
+
+    sfn.sendTaskFailure(r -> r
+        .taskToken(taskToken)
+        .error("OrderRejected")
+        .cause(reason));
+
+    return ResponseEntity.ok().build();
+}</code></pre>
+
+            <div class="exam-box">
+                <h4>🎓 Exam Insights — Step Functions</h4>
+                <ul>
+                    <li>Standard: max 1 year, exactly-once, 2000 starts/s — auditable, long-running</li>
+                    <li>Express: max 5 min, at-least-once, 100K starts/s — high-volume IoT/streaming</li>
+                    <li>Retry: exponential backoff with IntervalSeconds × BackoffRate^attempt</li>
+                    <li>Catch: route to error state on specific error types</li>
+                    <li>Parallel state: branches run concurrently (async); Task state: synchronous</li>
+                    <li>WaitForTaskToken: pause workflow until external system calls SendTaskSuccess/Failure</li>
+                    <li>Choice state: conditional branching (no retry/catch)</li>
+                    <li>States.ALL: catch-all error handler</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== LAB 4: API GW ADVANCED ===================== -->
+    <div class="lab" id="slab4">
+        <div class="lab-header" onclick="toggle(this)">
+            <span class="lab-num">Lab 4</span>
+            <span class="lab-title">API Gateway Advanced — Usage Plans, API Keys, Throttling & VPC Link</span>
+            <div style="display:flex;gap:6px"><span class="tag blue">API GW</span><span class="tag orange">Usage Plans</span><span class="tag purple">VPC Link</span></div>
+            <span class="chevron">▼</span>
+        </div>
+        <div class="lab-body">
+            <h3>🖥️ Console UI — Create Usage Plan with API Key</h3>
+            <div class="ui-steps">
+                <div class="ui-step">
+                    <div class="nav-path">AWS Console → API Gateway → Usage Plans → Create</div>
+                    <div class="action">Create a usage plan for your API tier</div>
+                    <div class="field"><span class="label">Name:</span><span class="val">BasicTier</span></div>
+                    <div class="field"><span class="label">Throttling — Rate:</span><span class="val">100 requests/second</span></div>
+                    <div class="field"><span class="label">Throttling — Burst:</span><span class="val">200 requests</span></div>
+                    <div class="field"><span class="label">Quota:</span><span class="val">10000 requests per Month</span></div>
+                    <div class="screenshot-note">📸 Rate = steady-state req/s. Burst = token bucket size (allows short spikes above rate).</div>
+                </div>
+                <div class="ui-step">
+                    <div class="nav-path">Usage Plan → Add API Stage</div>
+                    <div class="action">Associate the usage plan with your API and stage</div>
+                    <div class="field"><span class="label">API:</span><span class="val">my-orders-api</span></div>
+                    <div class="field"><span class="label">Stage:</span><span class="val">prod</span></div>
+                    <div class="field"><span class="label">Click:</span><span class="val imp">Add to Usage Plan</span></div>
+                </div>
+                <div class="ui-step">
+                    <div class="nav-path">API Gateway → API Keys → Create API Key</div>
+                    <div class="action">Generate an API key for a customer</div>
+                    <div class="field"><span class="label">Name:</span><span class="val">customer-acme-key</span></div>
+                    <div class="field"><span class="label">Auto Generate:</span><span class="val">Yes</span></div>
+                    <div class="field"><span class="label">Click:</span><span class="val imp">Save</span></div>
+                </div>
+                <div class="ui-step">
+                    <div class="nav-path">API Key → Usage Plans tab → Add to Usage Plan</div>
+                    <div class="action">Link the API key to the usage plan</div>
+                    <div class="field"><span class="label">Usage Plan:</span><span class="val">BasicTier</span></div>
+                    <div class="screenshot-note">📸 Order matters: Create API → Deploy to Stage → Create Usage Plan → Create API Key → Link Key to Plan</div>
+                </div>
+                <div class="ui-step">
+                    <div class="nav-path">API Gateway → Resources → Method → Method Request</div>
+                    <div class="action">Require API key on the method</div>
+                    <div class="field"><span class="label">API Key Required:</span><span class="val imp">true</span></div>
+                    <div class="field"><span class="label">Redeploy API after change!</span><span class="val warn">Actions → Deploy API → prod</span></div>
+                </div>
+                <div class="ui-step">
+                    <div class="nav-path">Terminal — Test with API key</div>
+                    <div class="action">Callers must include x-api-key header</div>
+                    <pre><code>curl -X GET https://abc123.execute-api.us-east-1.amazonaws.com/prod/orders \
+  -H "x-api-key: YOUR_API_KEY_VALUE"
+# Without key: 403 Forbidden</code></pre>
+                </div>
+            </div>
+
+            <h3>🖥️ Console UI — Per-Method Throttling</h3>
+            <div class="ui-steps">
+                <div class="ui-step">
+                    <div class="nav-path">API Gateway → Stages → prod → Default Route Settings</div>
+                    <div class="action">Set stage-level throttling (applies to all methods)</div>
+                    <div class="field"><span class="label">Rate limit:</span><span class="val">1000 req/s</span></div>
+                    <div class="field"><span class="label">Burst limit:</span><span class="val">2000</span></div>
+                </div>
+                <div class="ui-step">
+                    <div class="nav-path">Stages → prod → Resource → POST /orders → Override</div>
+                    <div class="action">Override throttling for a specific expensive method</div>
+                    <div class="field"><span class="label">Rate limit:</span><span class="val">10 req/s (lower for expensive operations)</span></div>
+                    <div class="field"><span class="label">Burst limit:</span><span class="val">20</span></div>
+                    <div class="screenshot-note">📸 Method-level throttling overrides stage-level. Throttle response = 429 Too Many Requests.</div>
+                </div>
+            </div>
+
+            <h3>🖥️ Console UI — VPC Link (Private Integration)</h3>
+            <div class="ui-steps">
+                <div class="ui-step">
+                    <div class="nav-path">API Gateway → VPC Links → Create</div>
+                    <div class="action">Create VPC Link to access private resources</div>
+                    <div class="field"><span class="label">Name:</span><span class="val">my-vpc-link</span></div>
+                    <div class="field"><span class="label">Target NLB ARN:</span><span class="val">arn:aws:elasticloadbalancing:...:loadbalancer/net/my-nlb/...</span></div>
+                    <div class="screenshot-note">📸 VPC Link requires a Network Load Balancer (NLB) in your VPC. ALB is NOT supported for VPC Link in REST APIs.</div>
+                </div>
+                <div class="ui-step">
+                    <div class="nav-path">API → Resource → Method → Integration Request</div>
+                    <div class="action">Configure private integration</div>
+                    <div class="field"><span class="label">Integration type:</span><span class="val">VPC Link</span></div>
+                    <div class="field"><span class="label">VPC Link:</span><span class="val">my-vpc-link</span></div>
+                    <div class="field"><span class="label">Endpoint URL:</span><span class="val">http://internal-nlb-dns/api/orders</span></div>
+                </div>
+            </div>
+
+            <div class="exam-box">
+                <h4>🎓 Exam Insights — API Gateway Advanced</h4>
+                <ul>
+                    <li>Usage plan order: Create API → Deploy → Create Usage Plan → Create API Key → Link</li>
+                    <li>API key header: <code>x-api-key</code> (lowercase, exact)</li>
+                    <li>Global throttle: 10,000 req/s across all APIs (soft limit, can increase)</li>
+                    <li>429 = throttled; 403 = missing/invalid API key; 504 = backend timeout (29s max)</li>
+                    <li>VPC Link: API GW → NLB → private resources. Requires NLB (not ALB) for REST APIs</li>
+                    <li>Custom domain: use ACM certificate + Route 53 alias record</li>
+                    <li>Cache invalidation: <code>Cache-Control: max-age=0</code> header (needs IAM auth)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== LAB 5: CLOUDFRONT + OAI ===================== -->
+    <div class="lab" id="slab5">
+        <div class="lab-header" onclick="toggle(this)">
+            <span class="lab-num">Lab 5</span>
+            <span class="lab-title">CloudFront — OAI, Signed URLs, Cache Behaviors & Lambda@Edge</span>
+            <div style="display:flex;gap:6px"><span class="tag orange">CloudFront</span><span class="tag teal">S3</span><span class="tag green">Lambda@Edge</span></div>
+            <span class="chevron">▼</span>
+        </div>
+        <div class="lab-body">
+            <h3>🏗️ Architecture — CloudFront + S3 with OAI</h3>
+            <div class="diagram">
+                <svg width="680" height="150" viewBox="0 0 680 150" xmlns="http://www.w3.org/2000/svg">
+                    <defs><marker id="a5" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#ff9900"/></marker></defs>
+                    <rect x="10" y="55" width="80" height="40" rx="5" fill="#1a2332" stroke="#2e3f52" stroke-width="1.5"/>
+                    <text x="50" y="79" text-anchor="middle" fill="#e8eaf0" font-size="9">User</text>
+                    <line x1="90" y1="75" x2="128" y2="75" stroke="#ff9900" stroke-width="1.5" marker-end="url(#a5)"/>
+                    <rect x="128" y="40" width="120" height="70" rx="6" fill="#1a2332" stroke="#ff9900" stroke-width="2"/>
+                    <text x="188" y="63" text-anchor="middle" fill="#ff9900" font-size="10" font-weight="bold">CloudFront</text>
+                    <text x="188" y="78" text-anchor="middle" fill="#8b9ab0" font-size="9">Edge Location</text>
+                    <text x="188" y="93" text-anchor="middle" fill="#2ecc71" font-size="8">Cache TTL: 86400s</text>
+                    <line x1="248" y1="65" x2="286" y2="55" stroke="#ff9900" stroke-width="1.5" marker-end="url(#a5)"/>
+                    <line x1="248" y1="85" x2="286" y2="95" stroke="#ff9900" stroke-width="1.5" marker-end="url(#a5)"/>
+                    <rect x="286" y="30" width="120" height="50" rx="6" fill="#1a2332" stroke="#00c7b7" stroke-width="2"/>
+                    <text x="346" y="52" text-anchor="middle" fill="#00c7b7" font-size="10" font-weight="bold">S3 Bucket</text>
+                    <text x="346" y="67" text-anchor="middle" fill="#8b9ab0" font-size="9">Private (no public access)</text>
+                    <rect x="286" y="90" width="120" height="40" rx="5" fill="#1a2332" stroke="#ff9900" stroke-width="1.5"/>
+                    <text x="346" y="108" text-anchor="middle" fill="#ff9900" font-size="9">API Gateway</text>
+                    <text x="346" y="122" text-anchor="middle" fill="#8b9ab0" font-size="8">Dynamic content</text>
+                    <rect x="440" y="30" width="120" height="50" rx="6" fill="#1a2332" stroke="#e74c3c" stroke-width="2"/>
+                    <text x="500" y="52" text-anchor="middle" fill="#e74c3c" font-size="10" font-weight="bold">OAI</text>
+                    <text x="500" y="67" text-anchor="middle" fill="#8b9ab0" font-size="9">Origin Access Identity</text>
+                    <line x1="406" y1="55" x2="440" y2="55" stroke="#e74c3c" stroke-width="1.5" marker-end="url(#a5)"/>
+                    <text x="340" y="18" text-anchor="middle" fill="#ff9900" font-size="11" font-weight="bold">CloudFront + OAI: S3 only accessible via CloudFront</text>
+                    <text x="340" y="140" text-anchor="middle" fill="#8b9ab0" font-size="9">OAI = special CloudFront identity that S3 bucket policy allows. Direct S3 access = 403.</text>
+                </svg>
+            </div>
+
+            <h3>🖥️ Console UI — Create CloudFront Distribution with OAI</h3>
+            <div class="ui-steps">
+                <div class="ui-step">
+                    <div class="nav-path">AWS Console → CloudFront → Distributions → Create distribution</div>
+                    <div class="action">Configure origin (S3 bucket)</div>
+                    <div class="field"><span class="label">Origin domain:</span><span class="val">my-private-bucket.s3.amazonaws.com</span></div>
+                    <div class="field"><span class="label">S3 bucket access:</span><span class="val imp">Origin access control settings (recommended)</span></div>
+                    <div class="field"><span class="label">Create new OAC:</span><span class="val">my-oac (Sign requests: Yes)</span></div>
+                    <div class="screenshot-note">📸 OAC (Origin Access Control) is the newer replacement for OAI. Both appear on the exam. OAC supports SSE-KMS encrypted buckets.</div>
+                </div>
+                <div class="ui-step">
+                    <div class="nav-path">Distribution → Default cache behavior</div>
+                    <div class="action">Configure viewer protocol and caching</div>
+                    <div class="field"><span class="label">Viewer protocol policy:</span><span class="val imp">Redirect HTTP to HTTPS</span></div>
+                    <div class="field"><span class="label">Cache policy:</span><span class="val">CachingOptimized</span></div>
+                    <div class="field"><span class="label">Compress objects automatically:</span><span class="val">Yes</span></div>
+                </div>
+                <div class="ui-step">
+                    <div class="nav-path">Distribution → Settings</div>
+                    <div class="action">Configure general settings</div>
+                    <div class="field"><span class="label">Price class:</span><span class="val">Use all edge locations (best performance)</span></div>
+                    <div class="field"><span class="label">Default root object:</span><span class="val">index.html</span></div>
+                    <div class="field"><span class="label">Click:</span><span class="val imp">Create distribution</span></div>
+                    <div class="screenshot-note">📸 Distribution takes 5-10 minutes to deploy globally. Status changes from "Deploying" to "Enabled".</div>
+                </div>
+                <div class="ui-step">
+                    <div class="nav-path">After creation → Copy S3 bucket policy</div>
+                    <div class="action">CloudFront shows a banner: "Copy policy" — apply it to your S3 bucket</div>
+                    <div class="field"><span class="label">Go to:</span><span class="val">S3 → my-private-bucket → Permissions → Bucket policy</span></div>
+                    <div class="field"><span class="label">Paste the generated policy that allows CloudFront OAC to read objects</span><span class="val"></span></div>
+                    <div class="screenshot-note">📸 The policy allows only the specific CloudFront distribution to access S3. Direct S3 URL access returns 403.</div>
+                </div>
+            </div>
+
+            <h3>🖥️ Console UI — Create Signed URL (for premium content)</h3>
+            <div class="ui-steps">
+                <div class="ui-step">
+                    <div class="nav-path">CloudFront → Key management → Public keys → Add public key</div>
+                    <div class="action">Upload your RSA public key for signing</div>
+                    <pre><code># Generate key pair locally
+openssl genrsa -out private_key.pem 2048
+openssl rsa -pubout -in private_key.pem -out public_key.pem</code></pre>
+                    <div class="field"><span class="label">Paste public_key.pem content into the console</span><span class="val"></span></div>
+                </div>
+                <div class="ui-step">
+                    <div class="nav-path">CloudFront → Key groups → Create key group</div>
+                    <div class="action">Create a key group containing your public key</div>
+                    <div class="field"><span class="label">Name:</span><span class="val">my-key-group</span></div>
+                    <div class="field"><span class="label">Keys:</span><span class="val">Select your uploaded public key</span></div>
+                </div>
+                <div class="ui-step">
+                    <div class="nav-path">Distribution → Behaviors → Edit → Restrict viewer access</div>
+                    <div class="action">Enable signed URLs/cookies for the behavior</div>
+                    <div class="field"><span class="label">Restrict viewer access:</span><span class="val imp">Yes</span></div>
+                    <div class="field"><span class="label">Trusted key groups:</span><span class="val">my-key-group</span></div>
+                </div>
+            </div>
+
+            <h3>☕ Java — Generate CloudFront Signed URL</h3>
+            <pre><code>// Generate signed URL in Java
+public String generateSignedUrl(String resourcePath, int expiryMinutes) throws Exception {
+    Instant expiry = Instant.now().plusSeconds(expiryMinutes * 60L);
+
+    // Load private key
+    PrivateKey privateKey = loadPrivateKey("private_key.pem");
+
+    SignedUrl signedUrl = CloudFrontUtilities.getSignedUrlWithCannedPolicy(
+        SignRequest.builder()
+            .resourceUrl("https://d1234.cloudfront.net/" + resourcePath)
+            .keyPairId("APKA1234567890")  // CloudFront key pair ID
+            .privateKey(privateKey)
+            .expirationDate(expiry)
+            .build());
+
+    return signedUrl.url();
+}</code></pre>
+
+            <div class="exam-box">
+                <h4>🎓 Exam Insights — CloudFront</h4>
+                <ul>
+                    <li>OAI/OAC: S3 bucket only accessible via CloudFront — direct S3 URL = 403</li>
+                    <li>Viewer Protocol Policy: "Redirect HTTP to HTTPS" or "HTTPS only" to force SSL</li>
+                    <li>Signed URLs: per-file access control. Signed Cookies: multiple files at once</li>
+                    <li>Cache invalidation: costs money. Use versioned file names instead (best practice)</li>
+                    <li>Lambda@Edge: run Lambda at edge locations for viewer/origin request/response modification</li>
+                    <li>CloudFront-Viewer-Country header: geo-restriction and routing</li>
+                    <li>Price classes: limit edge locations to reduce cost</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== LAB 6: ELASTIC BEANSTALK ===================== -->
+    <div class="lab" id="slab6">
+        <div class="lab-header" onclick="toggle(this)">
+            <span class="lab-num">Lab 6</span>
+            <span class="lab-title">Elastic Beanstalk — Deployment Policies, .ebextensions & Blue/Green</span>
+            <div style="display:flex;gap:6px"><span class="tag green">Beanstalk</span><span class="tag java">Java</span><span class="tag orange">Deploy</span></div>
+            <span class="chevron">▼</span>
+        </div>
+        <div class="lab-body">
+            <h3>🖥️ Console UI — Create Beanstalk Environment</h3>
+            <div class="ui-steps">
+                <div class="ui-step">
+                    <div class="nav-path">AWS Console → Elastic Beanstalk → Create application</div>
+                    <div class="action">Set up the application</div>
+                    <div class="field"><span class="label">Application name:</span><span class="val">my-orders-app</span></div>
+                    <div class="field"><span class="label">Platform:</span><span class="val">Java</span></div>
+                    <div class="field"><span class="label">Platform branch:</span><span class="val">Corretto 17 running on 64bit Amazon Linux 2023</span></div>
+                    <div class="field"><span class="label">Application code:</span><span class="val">Upload your code (JAR file)</span></div>
+                </div>
+                <div class="ui-step">
+                    <div class="nav-path">Configure service access</div>
+                    <div class="action">Set IAM roles for Beanstalk</div>
+                    <div class="field"><span class="label">Service role:</span><span class="val">aws-elasticbeanstalk-service-role (auto-created)</span></div>
+                    <div class="field"><span class="label">EC2 instance profile:</span><span class="val">aws-elasticbeanstalk-ec2-role</span></div>
+                    <div class="screenshot-note">📸 EC2 instance profile = IAM role attached to EC2 instances. Add S3/DynamoDB permissions here.</div>
+                </div>
+                <div class="ui-step">
+                    <div class="nav-path">Configure instance traffic and scaling</div>
+                    <div class="action">Choose environment tier and load balancer</div>
+                    <div class="field"><span class="label">Environment type:</span><span class="val imp">Load balanced (for production)</span></div>
+                    <div class="field"><span class="label">Load balancer type:</span><span class="val">Application Load Balancer</span></div>
+                    <div class="field"><span class="label">Min instances:</span><span class="val">2</span></div>
+                    <div class="field"><span class="label">Max instances:</span><span class="val">10</span></div>
+                </div>
+                <div class="ui-step">
+                    <div class="nav-path">Configure updates, monitoring, and logging → Deployment policy</div>
+                    <div class="action">Choose deployment strategy</div>
+                    <div class="field"><span class="label">Deployment policy:</span><span class="val warn">Immutable (safest for production)</span></div>
+                    <div class="screenshot-note">📸 Deployment policies comparison — see table below</div>
+                </div>
+                <div class="ui-step">
+                    <div class="nav-path">Configure environment properties</div>
+                    <div class="action">Set environment variables (replaces hardcoded config)</div>
+                    <div class="field"><span class="label">SERVER_PORT:</span><span class="val">5000</span></div>
+                    <div class="field"><span class="label">SPRING_PROFILES_ACTIVE:</span><span class="val">prod</span></div>
+                    <div class="field"><span class="label">DB_HOST:</span><span class="val">mydb.cluster.us-east-1.rds.amazonaws.com</span></div>
+                    <div class="screenshot-note">📸 Beanstalk injects these as OS environment variables. Spring Boot reads them automatically.</div>
+                </div>
+            </div>
+
+            <h3>📊 Deployment Policy Comparison</h3>
+            <table>
+                <tr><th>Policy</th><th>Downtime</th><th>Extra Cost</th><th>Rollback Speed</th><th>Use Case</th></tr>
+                <tr><td>All at once</td><td>Yes (brief)</td><td>None</td><td>Slow (redeploy)</td><td>Dev/test only</td></tr>
+                <tr><td>Rolling</td><td>Partial (below capacity)</td><td>None</td><td>Slow</td><td>Prod (tolerant)</td></tr>
+                <tr><td>Rolling + extra batch</td><td>No (at capacity)</td><td>Small (extra batch)</td><td>Slow</td><td>Prod (capacity-sensitive)</td></tr>
+                <tr><td style="color:var(--green)">Immutable</td><td>No</td><td>High (2× temp)</td><td>Fast (terminate new ASG)</td><td>Prod (safest)</td></tr>
+                <tr><td style="color:var(--blue)">Blue/Green</td><td>No</td><td>High (2× env)</td><td>Fast (swap URL back)</td><td>Prod (manual control)</td></tr>
+            </table>
+
+            <h3>📁 .ebextensions — Configure X-Ray + Environment</h3>
+            <pre><code># .ebextensions/xray.config
+option_settings:
+  aws:elasticbeanstalk:xray:
+    XRayEnabled: true
+
+# .ebextensions/environment.config
+option_settings:
+  aws:elasticbeanstalk:application:environment:
+    SERVER_PORT: 5000
+    SPRING_PROFILES_ACTIVE: prod
+  aws:autoscaling:asg:
+    MinSize: 2
+    MaxSize: 10
+  aws:autoscaling:trigger:
+    MeasureName: CPUUtilization
+    Statistic: Average
+    Unit: Percent
+    UpperThreshold: 70
+    LowerThreshold: 30
+    UpperBreachScaleIncrement: 2
+    LowerBreachScaleIncrement: -1</code></pre>
+
+            <h3>🖥️ Console UI — Blue/Green Deployment (Manual)</h3>
+            <div class="ui-steps">
+                <div class="ui-step">
+                    <div class="nav-path">Beanstalk → my-orders-app → prod-env → Actions → Clone environment</div>
+                    <div class="action">Create the Green environment (clone of Blue)</div>
+                    <div class="field"><span class="label">New environment name:</span><span class="val">prod-env-green</span></div>
+                </div>
+                <div class="ui-step">
+                    <div class="nav-path">prod-env-green → Upload and deploy</div>
+                    <div class="action">Deploy new version to Green environment only</div>
+                    <div class="field"><span class="label">Upload new JAR with v2 code</span><span class="val"></span></div>
+                    <div class="field"><span class="label">Test Green URL independently before swapping</span><span class="val"></span></div>
+                </div>
+                <div class="ui-step">
+                    <div class="nav-path">prod-env → Actions → Swap environment URLs</div>
+                    <div class="action">Swap URLs — zero downtime traffic switch</div>
+                    <div class="field"><span class="label">Environment to swap with:</span><span class="val">prod-env-green</span></div>
+                    <div class="field"><span class="label">Click:</span><span class="val imp">Swap</span></div>
+                    <div class="screenshot-note">📸 After swap: prod-env URL now serves v2 (Green). prod-env-green URL serves v1 (Blue). Rollback = swap again.</div>
+                </div>
+            </div>
+
+            <div class="exam-box">
+                <h4>🎓 Exam Insights — Elastic Beanstalk</h4>
+                <ul>
+                    <li>Beanstalk is FREE — you pay only for underlying EC2, RDS, ELB, etc.</li>
+                    <li>Beanstalk uses CloudFormation under the hood</li>
+                    <li>.ebextensions resources are DELETED when environment is deleted</li>
+                    <li>Blue/Green is NOT a native EB feature — it's manual (clone + swap URLs)</li>
+                    <li>Immutable = safest: new ASG created, health checked, then swapped. Quick rollback = terminate new ASG</li>
+                    <li>Package dependencies with source code (not resolved on EC2 at deploy time) = faster deploys</li>
+                    <li>Docker: add <code>Dockerrun.aws.json</code> to app root</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== LAB 7: RDS IAM AUTH + PROXY ===================== -->
+    <div class="lab" id="slab7">
+        <div class="lab-header" onclick="toggle(this)">
+            <span class="lab-num">Lab 7</span>
+            <span class="lab-title">RDS — IAM Database Authentication, RDS Proxy & Connection Pooling</span>
+            <div style="display:flex;gap:6px"><span class="tag blue">RDS</span><span class="tag orange">IAM Auth</span><span class="tag java">Java</span></div>
+            <span class="chevron">▼</span>
+        </div>
+        <div class="lab-body">
+            <h3>🏗️ Architecture — Lambda + RDS Proxy</h3>
+            <div class="diagram">
+                <svg width="680" height="130" viewBox="0 0 680 130" xmlns="http://www.w3.org/2000/svg">
+                    <defs><marker id="a7" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#ff9900"/></marker></defs>
+                    <rect x="10" y="45" width="100" height="50" rx="6" fill="#1a2332" stroke="#ff9900" stroke-width="1.5"/>
+                    <text x="60" y="67" text-anchor="middle" fill="#ff9900" font-size="9" font-weight="bold">Lambda × 1000</text>
+                    <text x="60" y="82" text-anchor="middle" fill="#8b9ab0" font-size="8">concurrent</text>
+                    <line x1="110" y1="70" x2="148" y2="70" stroke="#ff9900" stroke-width="1.5" marker-end="url(#a7)"/>
+                    <text x="129" y="63" text-anchor="middle" fill="#e74c3c" font-size="8">1000 connections!</text>
+                    <rect x="148" y="35" width="120" height="70" rx="6" fill="#1a2332" stroke="#2ecc71" stroke-width="2"/>
+                    <text x="208" y="58" text-anchor="middle" fill="#2ecc71" font-size="10" font-weight="bold">RDS Proxy</text>
+                    <text x="208" y="73" text-anchor="middle" fill="#8b9ab0" font-size="9">Connection pooling</text>
+                    <text x="208" y="88" text-anchor="middle" fill="#8b9ab0" font-size="8">Reuses connections</text>
+                    <line x1="268" y1="70" x2="306" y2="70" stroke="#ff9900" stroke-width="1.5" marker-end="url(#a7)"/>
+                    <text x="287" y="63" text-anchor="middle" fill="#2ecc71" font-size="8">~10 connections</text>
+                    <rect x="306" y="35" width="120" height="70" rx="6" fill="#1a2332" stroke="#3498db" stroke-width="2"/>
+                    <text x="366" y="58" text-anchor="middle" fill="#3498db" font-size="10" font-weight="bold">RDS MySQL</text>
+                    <text x="366" y="73" text-anchor="middle" fill="#8b9ab0" font-size="9">max_connections: 100</text>
+                    <text x="366" y="88" text-anchor="middle" fill="#8b9ab0" font-size="8">Private subnet</text>
+                    <text x="340" y="18" text-anchor="middle" fill="#ff9900" font-size="11" font-weight="bold">RDS Proxy: 1000 Lambda → ~10 DB connections (solves 1040 error)</text>
+                    <text x="340" y="118" text-anchor="middle" fill="#8b9ab0" font-size="9">RDS Proxy also supports IAM authentication and Secrets Manager rotation</text>
+                </svg>
+            </div>
+
+            <h3>🖥️ Console UI — Create RDS Proxy</h3>
+            <div class="ui-steps">
+                <div class="ui-step">
+                    <div class="nav-path">AWS Console → RDS → Proxies → Create proxy</div>
+                    <div class="action">Configure the proxy</div>
+                    <div class="field"><span class="label">Proxy identifier:</span><span class="val">my-db-proxy</span></div>
+                    <div class="field"><span class="label">Engine family:</span><span class="val">MySQL</span></div>
+                    <div class="field"><span class="label">Require TLS:</span><span class="val">Yes</span></div>
+                </div>
+                <div class="ui-step">
+                    <div class="nav-path">Proxy → Target group</div>
+                    <div class="action">Connect proxy to your RDS instance</div>
+                    <div class="field"><span class="label">Database:</span><span class="val">my-mysql-db</span></div>
+                    <div class="field"><span class="label">Connection pool max %:</span><span class="val">100</span></div>
+                </div>
+                <div class="ui-step">
+                    <div class="nav-path">Proxy → Authentication</div>
+                    <div class="action">Configure how proxy authenticates to RDS</div>
+                    <div class="field"><span class="label">Secrets Manager secret:</span><span class="val">prod/myapp/db (contains username/password)</span></div>
+                    <div class="field"><span class="label">IAM authentication:</span><span class="val warn">Required (enables IAM DB auth)</span></div>
+                    <div class="screenshot-note">📸 With IAM auth enabled, Lambda uses its IAM role to get a temporary auth token instead of a password</div>
+                </div>
+                <div class="ui-step">
+                    <div class="nav-path">Proxy → Connectivity</div>
+                    <div class="action">Place proxy in same VPC as RDS</div>
+                    <div class="field"><span class="label">VPC:</span><span class="val">my-vpc</span></div>
+                    <div class="field"><span class="label">Subnets:</span><span class="val">Private subnets (same as RDS)</span></div>
+                    <div class="field"><span class="label">VPC security group:</span><span class="val">sg-proxy (allow 3306 from Lambda SG)</span></div>
+                </div>
+            </div>
+
+            <h3>🖥️ Console UI — Enable IAM Database Authentication on RDS</h3>
+            <div class="ui-steps">
+                <div class="ui-step">
+                    <div class="nav-path">RDS → Databases → my-mysql-db → Modify</div>
+                    <div class="action">Enable IAM DB authentication</div>
+                    <div class="field"><span class="label">Database authentication:</span><span class="val imp">Password and IAM database authentication</span></div>
+                    <div class="field"><span class="label">Apply immediately:</span><span class="val">Yes</span></div>
+                </div>
+                <div class="ui-step">
+                    <div class="nav-path">RDS → Connect to DB → Run SQL</div>
+                    <div class="action">Create IAM DB user in MySQL</div>
+                    <pre><code>-- Create user that authenticates via IAM (no password)
+CREATE USER 'lambda_user'@'%' IDENTIFIED WITH AWSAuthenticationPlugin AS 'RDS';
+GRANT SELECT, INSERT, UPDATE ON myapp.* TO 'lambda_user'@'%';</code></pre>
+                </div>
+            </div>
+
+            <h3>☕ Java — IAM Database Authentication Token</h3>
+            <pre><code>@Configuration
+public class RdsIamConfig {
+
+    @Bean
+    public DataSource iamAuthDataSource() {
+        // Generate IAM auth token (valid 15 minutes)
+        RdsUtilities rdsUtilities = RdsUtilities.builder()
+            .region(Region.US_EAST_1)
+            .build();
+
+        String authToken = rdsUtilities.generateAuthenticationToken(r -> r
+            .hostname("my-db-proxy.proxy-abc.us-east-1.rds.amazonaws.com")
+            .port(3306)
+            .username("lambda_user"));
+
+        // Use token as password — no hardcoded credentials!
+        HikariConfig config = new HikariConfig();
+        config.setJdbcUrl("jdbc:mysql://my-db-proxy.proxy-abc.us-east-1.rds.amazonaws.com:3306/myapp"
+            + "?useSSL=true&requireSSL=true");
+        config.setUsername("lambda_user");
+        config.setPassword(authToken);  // IAM token as password
+        config.setMaximumPoolSize(5);
+        config.addDataSourceProperty("sslMode", "REQUIRED");
+
+        return new HikariDataSource(config);
+    }
+}</code></pre>
+
+            <div class="tip red"><strong>IAM DB auth token expires in 15 minutes.</strong> For Lambda, regenerate the token on each cold start (in static initializer). RDS Proxy handles token refresh automatically.</div>
+
+            <div class="exam-box">
+                <h4>🎓 Exam Insights — RDS</h4>
+                <ul>
+                    <li>RDS Proxy: solves "Too Many Connections" (error 1040). Pools connections. Supports IAM auth + Secrets Manager rotation.</li>
+                    <li>IAM DB auth: supported for MySQL and PostgreSQL (including Aurora). Token valid 15 min.</li>
+                    <li>Read Replica: async, different endpoint, SELECT only, up to 15 (MySQL/Postgres)</li>
+                    <li>Multi-AZ: sync, same DNS, automatic failover, NOT for read scaling</li>
+                    <li>Encrypt unencrypted DB: snapshot → copy with encryption → restore → migrate</li>
+                    <li>Enhanced Monitoring: agent on instance (vs default = hypervisor level)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== LAB 8: AURORA SERVERLESS ===================== -->
+    <div class="lab" id="slab8">
+        <div class="lab-header" onclick="toggle(this)">
+            <span class="lab-num">Lab 8</span>
+            <span class="lab-title">Aurora Serverless v2 — Auto-Scaling Database for Variable Workloads</span>
+            <div style="display:flex;gap:6px"><span class="tag green">Aurora</span><span class="tag blue">Serverless</span><span class="tag java">Java</span></div>
+            <span class="chevron">▼</span>
+        </div>
+        <div class="lab-body">
+            <h3>🖥️ Console UI — Create Aurora Serverless v2</h3>
+            <div class="ui-steps">
+                <div class="ui-step">
+                    <div class="nav-path">AWS Console → RDS → Create database</div>
+                    <div class="action">Choose Aurora Serverless</div>
+                    <div class="field"><span class="label">Engine type:</span><span class="val">Amazon Aurora</span></div>
+                    <div class="field"><span class="label">Edition:</span><span class="val">Aurora MySQL-Compatible</span></div>
+                    <div class="field"><span class="label">Engine version:</span><span class="val">Aurora MySQL 3.x (MySQL 8.0 compatible)</span></div>
+                </div>
+                <div class="ui-step">
+                    <div class="nav-path">Database settings → Instance configuration</div>
+                    <div class="action">Select Serverless v2</div>
+                    <div class="field"><span class="label">DB instance class:</span><span class="val imp">Serverless v2</span></div>
+                    <div class="field"><span class="label">Minimum ACUs:</span><span class="val">0.5 (scales to near-zero when idle)</span></div>
+                    <div class="field"><span class="label">Maximum ACUs:</span><span class="val">16 (1 ACU ≈ 2GB RAM)</span></div>
+                    <div class="screenshot-note">📸 ACU = Aurora Capacity Unit. Serverless v2 scales in fine-grained increments (0.5 ACU steps) within seconds.</div>
+                </div>
+                <div class="ui-step">
+                    <div class="nav-path">Connectivity</div>
+                    <div class="action">Place in private subnet (never public)</div>
+                    <div class="field"><span class="label">VPC:</span><span class="val">my-vpc</span></div>
+                    <div class="field"><span class="label">Public access:</span><span class="val imp">No</span></div>
+                    <div class="field"><span class="label">VPC security group:</span><span class="val">sg-aurora (allow 3306 from app SG)</span></div>
+                </div>
+                <div class="ui-step">
+                    <div class="nav-path">Additional configuration → Database authentication</div>
+                    <div class="action">Enable IAM authentication</div>
+                    <div class="field"><span class="label">Database authentication:</span><span class="val">Password and IAM database authentication</span></div>
+                </div>
+            </div>
+
+            <h3>Aurora vs RDS vs Aurora Serverless — Decision Guide</h3>
+            <table>
+                <tr><th>Feature</th><th>RDS MySQL</th><th>Aurora MySQL</th><th>Aurora Serverless v2</th></tr>
+                <tr><td>Read replicas</td><td>Up to 5</td><td>Up to 15</td><td>Up to 15</td></tr>
+                <tr><td>Failover time</td><td>~60-120s</td><td>~30s</td><td>~30s</td></tr>
+                <tr><td>Storage auto-grow</td><td>Manual</td><td>Auto (10GB increments)</td><td>Auto (10GB increments)</td></tr>
+                <tr><td>Scaling</td><td>Manual instance resize</td><td>Manual instance resize</td><td>Automatic (0.5–128 ACU)</td></tr>
+                <tr><td>Cost model</td><td>Per instance-hour</td><td>Per instance-hour</td><td>Per ACU-second</td></tr>
+                <tr><td>Best for</td><td>Steady workloads</td><td>High performance steady</td><td>Variable/unpredictable workloads</td></tr>
+            </table>
+
+            <div class="exam-box">
+                <h4>🎓 Exam Insights — Aurora Serverless</h4>
+                <ul>
+                    <li>Aurora Serverless v2: scales in seconds, fine-grained (0.5 ACU steps)</li>
+                    <li>Good for: dev/test, infrequent workloads, variable traffic</li>
+                    <li>Aurora Global Database: 1 primary + up to 5 secondary regions, &lt;1s replication lag</li>
+                    <li>Aurora supports IAM database authentication (same as RDS)</li>
+                    <li>Aurora costs ~20% more than RDS but 5× faster than MySQL RDS</li>
+                    <li>Aurora Serverless v1 (older): pauses when idle (cold start on resume). v2 does not pause.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== LAB 9: SDK + STS ===================== -->
+    <div class="lab" id="slab9">
+        <div class="lab-header" onclick="toggle(this)">
+            <span class="lab-num">Lab 9</span>
+            <span class="lab-title">AWS SDK in Lambda — S3 Upload, DynamoDB & STS Temporary Credentials</span>
+            <div style="display:flex;gap:6px"><span class="tag java">Java</span><span class="tag green">Lambda</span><span class="tag blue">STS</span></div>
+            <span class="chevron">▼</span>
+        </div>
+        <div class="lab-body">
+            <p>This lab covers the credential provider chain in Lambda, using SDK clients correctly (static initialization), and assuming cross-account roles with STS.</p>
+
+            <h3>🖥️ Console UI — Grant Lambda Permissions via IAM Role</h3>
+            <div class="ui-steps">
+                <div class="ui-step">
+                    <div class="nav-path">AWS Console → Lambda → my-function → Configuration → Permissions</div>
+                    <div class="action">Click the execution role name to open IAM</div>
+                    <div class="field"><span class="label">Execution role:</span><span class="val">my-function-role-abc123</span></div>
+                    <div class="screenshot-note">📸 This is the IAM role Lambda assumes when running. Add policies here to grant AWS service access.</div>
+                </div>
+                <div class="ui-step">
+                    <div class="nav-path">IAM → Roles → my-function-role → Add permissions → Attach policies</div>
+                    <div class="action">Add required AWS service permissions</div>
+                    <div class="field"><span class="label">Search and attach:</span><span class="val">AmazonS3FullAccess (or custom policy)</span></div>
+                    <div class="field"><span class="label">Also attach:</span><span class="val">AmazonDynamoDBFullAccess</span></div>
+                    <div class="screenshot-note">📸 Best practice: use least-privilege custom policies, not FullAccess managed policies</div>
+                </div>
+                <div class="ui-step">
+                    <div class="nav-path">IAM → Roles → my-function-role → Add permissions → Create inline policy</div>
+                    <div class="action">Create least-privilege custom policy</div>
+                    <pre><code>{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": ["s3:PutObject", "s3:GetObject"],
+      "Resource": "arn:aws:s3:::my-bucket/*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": ["dynamodb:PutItem", "dynamodb:GetItem", "dynamodb:UpdateItem"],
+      "Resource": "arn:aws:dynamodb:us-east-1:ACCOUNT:table/Orders"
+    }
+  ]
+}</code></pre>
+                </div>
+            </div>
+
+            <h3>☕ Java Lambda — SDK Clients (Correct Pattern)</h3>
+            <pre><code>/**
+ * CORRECT: Static initialization = runs once on cold start, reused on warm invocations
+ * WRONG: Creating clients inside handleRequest() = new client on every invocation (slow + wasteful)
+ */
+public class OrderProcessorLambda implements RequestHandler&lt;APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent&gt; {
+
+    // ✅ Static = initialized once, reused across warm invocations
+    private static final S3Client s3Client;
+    private static final DynamoDbClient dynamoDbClient;
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+
+    static {
+        // In Lambda, DefaultCredentialsProvider automatically uses the execution role
+        // No need to configure credentials — Lambda injects them via environment variables:
+        // AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SESSION_TOKEN
+        Region region = Region.of(System.getenv("AWS_REGION"));
+
+        s3Client = S3Client.builder()
+            .region(region)
+            .credentialsProvider(DefaultCredentialsProvider.create())
+            .build();
+
+        dynamoDbClient = DynamoDbClient.builder()
+            .region(region)
+            .credentialsProvider(DefaultCredentialsProvider.create())
+            .build();
+    }
+
+    @Override
+    public APIGatewayProxyResponseEvent handleRequest(
+            APIGatewayProxyRequestEvent event, Context context) {
+
+        try {
+            OrderRequest order = objectMapper.readValue(event.getBody(), OrderRequest.class);
+
+            // 1. Save to DynamoDB
+            Map&lt;String, AttributeValue&gt; item = Map.of(
+                "orderId", AttributeValue.fromS(context.getAwsRequestId()),
+                "customerId", AttributeValue.fromS(order.getCustomerId()),
+                "amount", AttributeValue.fromN(order.getAmount().toString()),
+                "status", AttributeValue.fromS("PENDING"),
+                "createdAt", AttributeValue.fromS(Instant.now().toString())
+            );
+            dynamoDbClient.putItem(r -> r
+                .tableName(System.getenv("TABLE_NAME"))
+                .item(item));
+
+            // 2. Upload order receipt to S3
+            String receiptKey = "receipts/" + context.getAwsRequestId() + ".json";
+            s3Client.putObject(r -> r
+                .bucket(System.getenv("BUCKET_NAME"))
+                .key(receiptKey)
+                .contentType("application/json"),
+                RequestBody.fromString(objectMapper.writeValueAsString(order)));
+
+            return new APIGatewayProxyResponseEvent()
+                .withStatusCode(201)
+                .withBody("{\"orderId\":\"" + context.getAwsRequestId() + "\"}");
+
+        } catch (Exception e) {
+            context.getLogger().log("ERROR: " + e.getMessage());
+            return new APIGatewayProxyResponseEvent()
+                .withStatusCode(500)
+                .withBody("{\"error\":\"Internal server error\"}");
+        }
+    }
+}</code></pre>
+
+            <h3>☕ STS — Assume Cross-Account Role in Lambda</h3>
+            <pre><code>// Lambda in Account A needs to access S3 in Account B
+public class CrossAccountLambda implements RequestHandler&lt;Map&lt;String, Object&gt;, String&gt; {
+
+    private static final StsClient stsClient = StsClient.create();
+
+    @Override
+    public String handleRequest(Map&lt;String, Object&gt; event, Context context) {
+        // Step 1: Assume role in Account B
+        AssumeRoleResponse response = stsClient.assumeRole(r -> r
+            .roleArn("arn:aws:iam::ACCOUNT_B:role/CrossAccountS3Role")
+            .roleSessionName("lambda-session-" + context.getAwsRequestId())
+            .durationSeconds(900));  // 15 minutes
+
+        Credentials tempCreds = response.credentials();
+
+        // Step 2: Create S3 client with temporary credentials
+        S3Client crossAccountS3 = S3Client.builder()
+            .region(Region.US_EAST_1)
+            .credentialsProvider(StaticCredentialsProvider.create(
+                AwsSessionCredentials.create(
+                    tempCreds.accessKeyId(),
+                    tempCreds.secretAccessKey(),
+                    tempCreds.sessionToken()  // REQUIRED for temp credentials
+                )))
+            .build();
+
+        // Step 3: Access Account B's S3
+        ListObjectsV2Response objects = crossAccountS3.listObjectsV2(r -> r
+            .bucket("account-b-bucket"));
+
+        return "Found " + objects.keyCount() + " objects";
+    }
+}</code></pre>
+
+            <div class="tip red"><strong>Session token is REQUIRED</strong> when using temporary credentials from STS AssumeRole. Omitting it causes authentication failures.</div>
+
+            <div class="exam-box">
+                <h4>🎓 Exam Insights — SDK & Credentials</h4>
+                <ul>
+                    <li>Lambda credential chain: env vars (AWS_ACCESS_KEY_ID etc.) → IAM execution role</li>
+                    <li>Initialize SDK clients in static blocks — reused across warm invocations</li>
+                    <li>Cross-account: use STS AssumeRole — never share credentials</li>
+                    <li>Temp credentials from STS: always include session token</li>
+                    <li>Default region if not set: us-east-1</li>
+                    <li>SDK exponential backoff: built-in for 429 (throttling) errors</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== LAB 10: CLOUDWATCH ===================== -->
+    <div class="lab" id="slab10">
+        <div class="lab-header" onclick="toggle(this)">
+            <span class="lab-num">Lab 10</span>
+            <span class="lab-title">CloudWatch — Custom Metrics, Alarms, Dashboards & Logs Insights</span>
+            <div style="display:flex;gap:6px"><span class="tag orange">CloudWatch</span><span class="tag blue">Alarms</span><span class="tag java">Java</span></div>
+            <span class="chevron">▼</span>
+        </div>
+        <div class="lab-body">
+            <h3>🖥️ Console UI — Create Custom Metric Alarm</h3>
+            <div class="ui-steps">
+                <div class="ui-step">
+                    <div class="nav-path">AWS Console → CloudWatch → Alarms → Create alarm</div>
+                    <div class="action">Select metric to alarm on</div>
+                    <div class="field"><span class="label">Click:</span><span class="val">Select metric</span></div>
+                    <div class="field"><span class="label">Browse to:</span><span class="val">Custom namespaces → MyApp/Orders → OrderProcessingTime</span></div>
+                    <div class="screenshot-note">📸 Custom metrics appear here after you push them via PutMetricData API. Default EC2 metrics are under EC2 namespace.</div>
+                </div>
+                <div class="ui-step">
+                    <div class="nav-path">Specify metric and conditions</div>
+                    <div class="action">Configure alarm threshold</div>
+                    <div class="field"><span class="label">Statistic:</span><span class="val">Average</span></div>
+                    <div class="field"><span class="label">Period:</span><span class="val">1 minute</span></div>
+                    <div class="field"><span class="label">Threshold type:</span><span class="val">Static</span></div>
+                    <div class="field"><span class="label">Condition:</span><span class="val">Greater than 5000 (ms)</span></div>
+                    <div class="field"><span class="label">Datapoints to alarm:</span><span class="val">3 out of 5 (reduces false positives)</span></div>
+                </div>
+                <div class="ui-step">
+                    <div class="nav-path">Configure actions</div>
+                    <div class="action">Set what happens when alarm triggers</div>
+                    <div class="field"><span class="label">Alarm state trigger:</span><span class="val">In alarm</span></div>
+                    <div class="field"><span class="label">Send notification to SNS topic:</span><span class="val">ops-alerts</span></div>
+                    <div class="field"><span class="label">Also add:</span><span class="val">Auto Scaling action (scale out when CPU high)</span></div>
+                    <div class="screenshot-note">📸 Alarm states: OK (green), ALARM (red), INSUFFICIENT_DATA (grey = not enough data points yet)</div>
+                </div>
+                <div class="ui-step">
+                    <div class="nav-path">Add name and description</div>
+                    <div class="action">Name the alarm</div>
+                    <div class="field"><span class="label">Alarm name:</span><span class="val">HighOrderProcessingLatency</span></div>
+                    <div class="field"><span class="label">Click:</span><span class="val imp">Create alarm</span></div>
+                </div>
+            </div>
+
+            <h3>🖥️ Console UI — CloudWatch Logs Insights Query</h3>
+            <div class="ui-steps">
+                <div class="ui-step">
+                    <div class="nav-path">CloudWatch → Logs Insights</div>
+                    <div class="action">Select log group and run query</div>
+                    <div class="field"><span class="label">Log group:</span><span class="val">/aws/lambda/order-processor</span></div>
+                    <div class="field"><span class="label">Time range:</span><span class="val">Last 1 hour</span></div>
+                </div>
+                <div class="ui-step">
+                    <div class="nav-path">Query editor</div>
+                    <div class="action">Run useful queries for DVA-C02 exam scenarios</div>
+                    <pre><code># Find all ERROR logs
+fields @timestamp, @message
+| filter @message like /ERROR/
+| sort @timestamp desc
+| limit 50
+
+# Count errors by minute
+fields @timestamp, @message
+| filter @message like /ERROR/
+| stats count(*) as errorCount by bin(1m)
+| sort @timestamp desc
+
+# Lambda cold starts (INIT_START in logs)
+fields @timestamp, @message
+| filter @message like /INIT_START/
+| stats count(*) as coldStarts by bin(1h)
+
+# Lambda duration and memory usage
+fields @timestamp, @duration, @maxMemoryUsed, @memorySize
+| filter @type = "REPORT"
+| stats avg(@duration), max(@duration), avg(@maxMemoryUsed) by bin(5m)</code></pre>
+                    <div class="screenshot-note">📸 Logs Insights results can be added to CloudWatch Dashboards. Results are not real-time — there's a few seconds delay.</div>
+                </div>
+            </div>
+
+            <h3>🖥️ Console UI — Create CloudWatch Dashboard</h3>
+            <div class="ui-steps">
+                <div class="ui-step">
+                    <div class="nav-path">CloudWatch → Dashboards → Create dashboard</div>
+                    <div class="action">Create operational dashboard</div>
+                    <div class="field"><span class="label">Dashboard name:</span><span class="val">OrdersAppDashboard</span></div>
+                    <div class="field"><span class="label">Add widget → Line chart:</span><span class="val">Lambda Invocations + Errors + Duration</span></div>
+                    <div class="field"><span class="label">Add widget → Number:</span><span class="val">DynamoDB ConsumedReadCapacityUnits</span></div>
+                    <div class="field"><span class="label">Add widget → Alarm status:</span><span class="val">HighOrderProcessingLatency alarm</span></div>
+                </div>
+            </div>
+
+            <h3>☕ Java — Push Custom Metrics</h3>
+            <pre><code>@Service
+public class MetricsPublisher {
+
+    private static final CloudWatchClient cloudWatch = CloudWatchClient.create();
+
+    // Call this after processing each order
+    public void recordOrderMetrics(String customerId, double processingTimeMs, boolean success) {
+        List&lt;MetricDatum&gt; metrics = List.of(
+            MetricDatum.builder()
+                .metricName("OrderProcessingTime")
+                .value(processingTimeMs)
+                .unit(StandardUnit.MILLISECONDS)
+                .timestamp(Instant.now())
+                .dimensions(
+                    Dimension.builder().name("Environment").value("prod").build(),
+                    Dimension.builder().name("Region").value("us-east-1").build()
+                )
+                .build(),
+            MetricDatum.builder()
+                .metricName(success ? "OrderSuccess" : "OrderFailure")
+                .value(1.0)
+                .unit(StandardUnit.COUNT)
+                .timestamp(Instant.now())
+                .build()
+        );
+
+        cloudWatch.putMetricData(r -> r
+            .namespace("MyApp/Orders")
+            .metricData(metrics));
+    }
+}</code></pre>
+
+            <div class="exam-box">
+                <h4>🎓 Exam Insights — CloudWatch</h4>
+                <ul>
+                    <li>EC2 default: CPU, Network, Disk I/O — every 5 min. Detailed monitoring = 1 min (costs extra)</li>
+                    <li>Memory, swap = NOT default — install CloudWatch Agent or push via PutMetricData</li>
+                    <li>High-resolution custom metrics: up to 1 second (StorageResolution parameter)</li>
+                    <li>Alarm states: OK, ALARM, INSUFFICIENT_DATA</li>
+                    <li>Logs Insights: interactive query language for log analysis. Not real-time.</li>
+                    <li>Log group encryption: KMS at group level. Cannot specify KMS key via CLI create-log-group.</li>
+                    <li>CloudWatch Events / EventBridge: react to AWS service events or schedule cron jobs</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== LAB 11: VPC NETWORKING ===================== -->
+    <div class="lab" id="slab11">
+        <div class="lab-header" onclick="toggle(this)">
+            <span class="lab-num">Lab 11</span>
+            <span class="lab-title">VPC Networking — Lambda in VPC, VPC Endpoints, NAT Gateway & Security Groups</span>
+            <div style="display:flex;gap:6px"><span class="tag purple">VPC</span><span class="tag green">Lambda</span><span class="tag blue">Endpoints</span></div>
+            <span class="chevron">▼</span>
+        </div>
+        <div class="lab-body">
+            <h3>🏗️ Architecture — Lambda in VPC with Endpoints</h3>
+            <div class="diagram">
+                <svg width="700" height="220" viewBox="0 0 700 220" xmlns="http://www.w3.org/2000/svg">
+                    <defs><marker id="a11" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#ff9900"/></marker></defs>
+                    <!-- VPC boundary -->
+                    <rect x="10" y="20" width="580" height="190" rx="8" fill="none" stroke="#2e3f52" stroke-width="1.5" stroke-dasharray="6,3"/>
+                    <text x="300" y="38" text-anchor="middle" fill="#2e3f52" font-size="10">VPC (10.0.0.0/16)</text>
+                    <!-- Private subnet -->
+                    <rect x="20" y="45" width="260" height="155" rx="6" fill="none" stroke="#3498db" stroke-width="1" stroke-dasharray="4,2"/>
+                    <text x="150" y="62" text-anchor="middle" fill="#3498db" font-size="9">Private Subnet (10.0.1.0/24)</text>
+                    <!-- Lambda -->
+                    <rect x="30" y="70" width="110" height="60" rx="5" fill="#1a2332" stroke="#ff9900" stroke-width="1.5"/>
+                    <text x="85" y="93" text-anchor="middle" fill="#ff9900" font-size="9" font-weight="bold">Lambda</text>
+                    <text x="85" y="108" text-anchor="middle" fill="#8b9ab0" font-size="8">ENI in private subnet</text>
+                    <!-- RDS -->
+                    <rect x="160" y="70" width="110" height="60" rx="5" fill="#1a2332" stroke="#3498db" stroke-width="1.5"/>
+                    <text x="215" y="93" text-anchor="middle" fill="#3498db" font-size="9" font-weight="bold">RDS</text>
+                    <text x="215" y="108" text-anchor="middle" fill="#8b9ab0" font-size="8">Private subnet</text>
+                    <line x1="140" y1="100" x2="160" y2="100" stroke="#ff9900" stroke-width="1.5" marker-end="url(#a11)"/>
+                    <!-- VPC Endpoint for DynamoDB -->
+                    <rect x="30" y="150" width="240" height="35" rx="5" fill="#1a2332" stroke="#2ecc71" stroke-width="1.5"/>
+                    <text x="150" y="165" text-anchor="middle" fill="#2ecc71" font-size="9" font-weight="bold">VPC Endpoint (Gateway)</text>
+                    <text x="150" y="178" text-anchor="middle" fill="#8b9ab0" font-size="8">DynamoDB / S3 — no internet needed</text>
+                    <line x1="85" y1="130" x2="85" y2="150" stroke="#2ecc71" stroke-width="1.5" marker-end="url(#a11)"/>
+                    <!-- NAT Gateway -->
+                    <rect x="310" y="45" width="130" height="60" rx="5" fill="#1a2332" stroke="#f39c12" stroke-width="1.5"/>
+                    <text x="375" y="68" text-anchor="middle" fill="#f39c12" font-size="9" font-weight="bold">NAT Gateway</text>
+                    <text x="375" y="83" text-anchor="middle" fill="#8b9ab0" font-size="8">Public subnet</text>
+                    <text x="375" y="96" text-anchor="middle" fill="#8b9ab0" font-size="8">For internet access</text>
+                    <line x1="140" y1="85" x2="310" y2="75" stroke="#f39c12" stroke-width="1" stroke-dasharray="4,2" marker-end="url(#a11)"/>
+                    <!-- Internet -->
+                    <rect x="610" y="80" width="80" height="40" rx="5" fill="#1a2332" stroke="#2e3f52" stroke-width="1.5"/>
+                    <text x="650" y="104" text-anchor="middle" fill="#e8eaf0" font-size="9">Internet</text>
+                    <line x1="440" y1="75" x2="610" y2="100" stroke="#f39c12" stroke-width="1.5" marker-end="url(#a11)"/>
+                    <!-- DynamoDB outside VPC -->
+                    <rect x="460" y="150" width="120" height="40" rx="5" fill="#1a2332" stroke="#3498db" stroke-width="1.5"/>
+                    <text x="520" y="174" text-anchor="middle" fill="#3498db" font-size="9">DynamoDB (AWS)</text>
+                    <line x1="270" y1="167" x2="460" y2="170" stroke="#2ecc71" stroke-width="1.5" stroke-dasharray="4,2" marker-end="url(#a11)"/>
+                    <text x="365" y="160" text-anchor="middle" fill="#2ecc71" font-size="8">Via VPC Endpoint (private)</text>
+                    <text x="350" y="210" text-anchor="middle" fill="#8b9ab0" font-size="9">Lambda in VPC: needs NAT Gateway for internet | VPC Endpoint for AWS services (no internet)</text>
+                </svg>
+            </div>
+
+            <h3>🖥️ Console UI — Put Lambda in VPC</h3>
+            <div class="ui-steps">
+                <div class="ui-step">
+                    <div class="nav-path">AWS Console → Lambda → my-function → Configuration → VPC</div>
+                    <div class="action">Edit VPC configuration</div>
+                    <div class="field"><span class="label">VPC:</span><span class="val">my-vpc</span></div>
+                    <div class="field"><span class="label">Subnets:</span><span class="val imp">Private subnets ONLY (at least 2 AZs for HA)</span></div>
+                    <div class="field"><span class="label">Security groups:</span><span class="val">sg-lambda</span></div>
+                    <div class="screenshot-note">📸 Lambda in VPC creates an ENI in each selected subnet. Lambda needs AWSLambdaVPCAccessExecutionRole.</div>
+                </div>
+                <div class="ui-step">
+                    <div class="nav-path">IAM → Roles → my-function-role → Attach policies</div>
+                    <div class="action">Add VPC access policy</div>
+                    <div class="field"><span class="label">Attach:</span><span class="val">AWSLambdaVPCAccessExecutionRole</span></div>
+                    <div class="screenshot-note">📸 This policy allows Lambda to create/delete ENIs in your VPC. Without it, Lambda deployment fails.</div>
+                </div>
+                <div class="ui-step">
+                    <div class="nav-path">EC2 → Security Groups → Create security group</div>
+                    <div class="action">Create Lambda security group</div>
+                    <div class="field"><span class="label">Name:</span><span class="val">sg-lambda</span></div>
+                    <div class="field"><span class="label">VPC:</span><span class="val">my-vpc</span></div>
+                    <div class="field"><span class="label">Inbound rules:</span><span class="val">None (Lambda doesn't receive inbound)</span></div>
+                    <div class="field"><span class="label">Outbound rules:</span><span class="val">All traffic → 0.0.0.0/0 (or restrict to specific SGs)</span></div>
+                </div>
+                <div class="ui-step">
+                    <div class="nav-path">EC2 → Security Groups → sg-rds → Inbound rules → Edit</div>
+                    <div class="action">Allow Lambda to connect to RDS</div>
+                    <div class="field"><span class="label">Type:</span><span class="val">MySQL/Aurora (3306)</span></div>
+                    <div class="field"><span class="label">Source:</span><span class="val imp">sg-lambda (security group ID, not CIDR)</span></div>
+                    <div class="screenshot-note">📸 Using SG as source (not CIDR) is best practice — automatically includes all Lambda ENIs</div>
+                </div>
+            </div>
+
+            <h3>🖥️ Console UI — Create VPC Endpoint for DynamoDB</h3>
+            <div class="ui-steps">
+                <div class="ui-step">
+                    <div class="nav-path">VPC → Endpoints → Create endpoint</div>
+                    <div class="action">Create Gateway endpoint for DynamoDB (free)</div>
+                    <div class="field"><span class="label">Service category:</span><span class="val">AWS services</span></div>
+                    <div class="field"><span class="label">Service name:</span><span class="val">com.amazonaws.us-east-1.dynamodb</span></div>
+                    <div class="field"><span class="label">Endpoint type:</span><span class="val warn">Gateway (free — for S3 and DynamoDB only)</span></div>
+                    <div class="field"><span class="label">VPC:</span><span class="val">my-vpc</span></div>
+                    <div class="field"><span class="label">Route tables:</span><span class="val">Select private subnet route tables</span></div>
+                    <div class="screenshot-note">📸 Gateway endpoints are FREE and add a route to your route table. Interface endpoints (for other services) cost money.</div>
+                </div>
+                <div class="ui-step">
+                    <div class="nav-path">VPC → Endpoints → Create endpoint (for other AWS services)</div>
+                    <div class="action">Create Interface endpoint for Secrets Manager</div>
+                    <div class="field"><span class="label">Service name:</span><span class="val">com.amazonaws.us-east-1.secretsmanager</span></div>
+                    <div class="field"><span class="label">Endpoint type:</span><span class="val">Interface (creates ENI in subnet)</span></div>
+                    <div class="field"><span class="label">Subnets:</span><span class="val">Private subnets</span></div>
+                    <div class="field"><span class="label">Enable DNS name:</span><span class="val">Yes (overrides public DNS)</span></div>
+                </div>
+            </div>
+
+            <h3>🖥️ Console UI — Create NAT Gateway (for Lambda internet access)</h3>
+            <div class="ui-steps">
+                <div class="ui-step">
+                    <div class="nav-path">VPC → NAT gateways → Create NAT gateway</div>
+                    <div class="action">Create NAT Gateway in PUBLIC subnet</div>
+                    <div class="field"><span class="label">Subnet:</span><span class="val imp">PUBLIC subnet (not private!)</span></div>
+                    <div class="field"><span class="label">Connectivity type:</span><span class="val">Public</span></div>
+                    <div class="field"><span class="label">Elastic IP:</span><span class="val">Allocate Elastic IP</span></div>
+                </div>
+                <div class="ui-step">
+                    <div class="nav-path">VPC → Route tables → Private subnet route table → Edit routes</div>
+                    <div class="action">Route internet traffic through NAT Gateway</div>
+                    <div class="field"><span class="label">Destination:</span><span class="val">0.0.0.0/0</span></div>
+                    <div class="field"><span class="label">Target:</span><span class="val">nat-xxxxxxxxx (your NAT Gateway)</span></div>
+                    <div class="screenshot-note">📸 Lambda in private subnet → NAT Gateway (public subnet) → Internet Gateway → Internet. CloudWatch Logs work without NAT (uses VPC endpoint).</div>
+                </div>
+            </div>
+
+            <div class="exam-box">
+                <h4>🎓 Exam Insights — VPC Networking</h4>
+                <ul>
+                    <li>Lambda in VPC: creates ENI, needs <code>AWSLambdaVPCAccessExecutionRole</code></li>
+                    <li>Lambda in VPC cannot access internet by default — needs NAT Gateway in public subnet</li>
+                    <li>CloudWatch Logs work from private subnet WITHOUT NAT (uses VPC endpoint)</li>
+                    <li>DynamoDB accessible via VPC Gateway Endpoint (free) or public internet</li>
+                    <li>Gateway endpoints: S3 and DynamoDB only — FREE</li>
+                    <li>Interface endpoints: all other AWS services — cost money (per hour + per GB)</li>
+                    <li>Security Groups: stateful (allow inbound = allow return outbound automatically)</li>
+                    <li>NACLs: stateless (must explicitly allow both inbound AND outbound)</li>
+                    <li>Timeout error = SG issue; Connection refused = app issue</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===================== LAB 12: AWS CONFIG ===================== -->
+    <div class="lab" id="slab12">
+        <div class="lab-header" onclick="toggle(this)">
+            <span class="lab-num">Lab 12</span>
+            <span class="lab-title">AWS Config — Compliance Rules, Remediation & CloudTrail Integration</span>
+            <div style="display:flex;gap:6px"><span class="tag orange">AWS Config</span><span class="tag blue">CloudTrail</span><span class="tag red">Compliance</span></div>
+            <span class="chevron">▼</span>
+        </div>
+        <div class="lab-body">
+            <h3>🖥️ Console UI — Enable AWS Config</h3>
+            <div class="ui-steps">
+                <div class="ui-step">
+                    <div class="nav-path">AWS Console → Config → Get started</div>
+                    <div class="action">Configure AWS Config settings</div>
+                    <div class="field"><span class="label">Recording strategy:</span><span class="val">Record all resources supported in this region</span></div>
+                    <div class="field"><span class="label">Include global resources:</span><span class="val">Yes (IAM users, roles, policies)</span></div>
+                </div>
+                <div class="ui-step">
+                    <div class="nav-path">Config → Delivery method</div>
+                    <div class="action">Configure where Config stores data</div>
+                    <div class="field"><span class="label">S3 bucket:</span><span class="val">config-bucket-ACCOUNT-us-east-1 (auto-created)</span></div>
+                    <div class="field"><span class="label">SNS topic:</span><span class="val">config-notifications (optional, for alerts)</span></div>
+                    <div class="screenshot-note">📸 Config requires IAM role with: read-only to AWS resources, write to S3, publish to SNS</div>
+                </div>
+                <div class="ui-step">
+                    <div class="nav-path">Config → Rules → Add rule</div>
+                    <div class="action">Add managed compliance rules</div>
+                    <div class="field"><span class="label">Search for:</span><span class="val">s3-bucket-public-read-prohibited</span></div>
+                    <div class="field"><span class="label">Also add:</span><span class="val">encrypted-volumes (EBS encryption)</span></div>
+                    <div class="field"><span class="label">Also add:</span><span class="val">lambda-function-public-access-prohibited</span></div>
+                    <div class="field"><span class="label">Also add:</span><span class="val">rds-instance-public-access-check</span></div>
+                    <div class="screenshot-note">📸 AWS Config has 200+ managed rules. Rules evaluate resources periodically or on configuration change.</div>
+                </div>
+                <div class="ui-step">
+                    <div class="nav-path">Config → Rules → s3-bucket-public-read-prohibited → Actions → Re-evaluate</div>
+                    <div class="action">Manually trigger evaluation</div>
+                    <div class="field"><span class="label">Results show:</span><span class="val">Compliant / Non-compliant per resource</span></div>
+                    <div class="screenshot-note">📸 Non-compliant resources are listed with the specific violation. Click a resource to see its configuration history.</div>
+                </div>
+                <div class="ui-step">
+                    <div class="nav-path">Config → Rules → Non-compliant rule → Actions → Manage remediation</div>
+                    <div class="action">Set up automatic remediation</div>
+                    <div class="field"><span class="label">Remediation action:</span><span class="val">AWS-DisableS3BucketPublicReadWrite (SSM Automation)</span></div>
+                    <div class="field"><span class="label">Auto remediation:</span><span class="val">Yes (automatically fixes violations)</span></div>
+                </div>
+            </div>
+
+            <h3>🖥️ Console UI — CloudTrail + Config Integration</h3>
+            <div class="ui-steps">
+                <div class="ui-step">
+                    <div class="nav-path">CloudTrail → Trails → Create trail</div>
+                    <div class="action">Create a trail for API audit logging</div>
+                    <div class="field"><span class="label">Trail name:</span><span class="val">management-events-trail</span></div>
+                    <div class="field"><span class="label">Storage location:</span><span class="val">S3 bucket: cloudtrail-logs-ACCOUNT</span></div>
+                    <div class="field"><span class="label">CloudWatch Logs:</span><span class="val">Enable (send to /aws/cloudtrail log group)</span></div>
+                    <div class="field"><span class="label">Management events:</span><span class="val">Read + Write</span></div>
+                    <div class="screenshot-note">📸 CloudTrail is enabled by default but only keeps 90 days. Create a trail to store logs in S3 indefinitely.</div>
+                </div>
+                <div class="ui-step">
+                    <div class="nav-path">CloudTrail → Event history</div>
+                    <div class="action">Investigate a deleted resource</div>
+                    <div class="field"><span class="label">Filter by:</span><span class="val">Event name: DeleteBucket</span></div>
+                    <div class="field"><span class="label">Shows:</span><span class="val">Who deleted it, when, from which IP</span></div>
+                    <div class="screenshot-note">📸 "If a resource is deleted unexpectedly → check CloudTrail first" — this is a common exam scenario</div>
+                </div>
+            </div>
+
+            <h3>CloudTrail vs CloudWatch vs Config — Key Differences</h3>
+            <table>
+                <tr><th>Service</th><th>Purpose</th><th>What it tracks</th><th>Exam trigger words</th></tr>
+                <tr><td style="color:var(--blue)">CloudTrail</td><td>API audit</td><td>Who did what API call, when, from where</td><td>"deleted", "who called", "audit", "compliance"</td></tr>
+                <tr><td style="color:var(--accent)">CloudWatch</td><td>Performance monitoring</td><td>Metrics, logs, alarms, dashboards</td><td>"latency", "CPU", "errors", "alert", "scale"</td></tr>
+                <tr><td style="color:var(--green)">AWS Config</td><td>Resource compliance</td><td>Resource configuration state over time</td><td>"compliant", "configuration change", "drift", "rule"</td></tr>
+            </table>
+
+            <div class="exam-box">
+                <h4>🎓 Exam Insights — AWS Config & CloudTrail</h4>
+                <ul>
+                    <li>CloudTrail: enabled by default, 90-day history. Create trail for long-term S3 storage.</li>
+                    <li>Resource deleted unexpectedly → check CloudTrail first</li>
+                    <li>AWS Config: compliance checks, resource configuration history, drift detection</li>
+                    <li>Config requires IAM role: read-only to resources, write to S3, publish to SNS</li>
+                    <li>Config + CloudTrail together: Config shows what changed, CloudTrail shows who changed it</li>
+                    <li>Config rules: managed (200+) or custom (Lambda-backed)</li>
+                    <li>Remediation: SSM Automation documents fix non-compliant resources automatically</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+</main>
+
+<script>
+    function toggle(header) {
+        const lab = header.parentElement;
+        lab.classList.toggle('open');
+    }
+    const sections = document.querySelectorAll('.lab[id]');
+    const navLinks = document.querySelectorAll('nav a');
+    window.addEventListener('scroll', () => {
+        let current = '';
+        sections.forEach(s => { if (window.scrollY >= s.offsetTop - 80) current = s.id; });
+        navLinks.forEach(a => { a.classList.toggle('active', a.getAttribute('href') === '#' + current); });
+    });
+    window.addEventListener('load', () => {
+        if (location.hash) {
+            const t = document.querySelector(location.hash);
+            if (t) t.classList.add('open');
+        }
+    });
+</script>
+</body>
+</html>

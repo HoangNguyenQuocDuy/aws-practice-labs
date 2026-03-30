@@ -1,0 +1,1900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS DVA-C02 — Java & Spring Boot Labs</title>
+    <style>
+        :root{
+            --bg:#0f1117;--surface:#1a1d27;--card:#21253a;--border:#2e3350;
+            --accent:#ff9900;--accent2:#00c7b7;--accent3:#7c6af7;
+            --text:#e8eaf0;--muted:#8b92a8;
+            --green:#2ecc71;--red:#e74c3c;--yellow:#f39c12;--blue:#3498db;
+            --java:#f89820;--spring:#6db33f;
+        }
+        *{box-sizing:border-box;margin:0;padding:0;}
+        body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;font-size:14px;line-height:1.65;}
+
+        nav{position:fixed;top:0;left:0;width:230px;height:100vh;background:var(--surface);border-right:1px solid var(--border);overflow-y:auto;padding:10px 0;z-index:100;}
+        nav .logo{padding:10px 14px 12px;border-bottom:1px solid var(--border);margin-bottom:6px;}
+        nav .logo .title{color:var(--java);font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1px;}
+        nav .logo .sub{color:var(--spring);font-size:11px;margin-top:2px;}
+        nav .cat{font-size:10px;color:var(--accent3);text-transform:uppercase;letter-spacing:1px;padding:8px 14px 2px;font-weight:700;}
+        nav a{display:block;padding:5px 14px;color:var(--muted);font-size:12px;border-left:3px solid transparent;text-decoration:none;transition:all .15s;}
+        nav a:hover,nav a.active{color:var(--text);border-left-color:var(--java);background:rgba(248,152,32,.06);}
+
+        main{margin-left:230px;padding:26px 34px;max-width:1100px;}
+
+        .hero{background:linear-gradient(135deg,#1a1d27,#21253a);border:1px solid var(--border);border-radius:10px;padding:24px 28px;margin-bottom:24px;display:flex;gap:20px;align-items:flex-start;}
+        .hero-text h1{font-size:22px;color:var(--java);margin-bottom:6px;}
+        .hero-text p{color:var(--muted);font-size:13px;line-height:1.6;}
+        .hero-badges{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+        .badge{display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;}
+        .badge.java{background:rgba(248,152,32,.2);color:var(--java);border:1px solid rgba(248,152,32,.3);}
+        .badge.spring{background:rgba(109,179,63,.2);color:var(--spring);border:1px solid rgba(109,179,63,.3);}
+        .badge.aws{background:rgba(255,153,0,.2);color:var(--accent);border:1px solid rgba(255,153,0,.3);}
+
+        /* LAB */
+        .lab{background:var(--card);border:1px solid var(--border);border-radius:10px;margin-bottom:22px;overflow:hidden;}
+        .lab-header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;}
+        .lab-header:hover{background:rgba(255,255,255,.02);}
+        .lab-num{background:var(--java);color:#000;font-weight:700;font-size:11px;padding:2px 8px;border-radius:20px;white-space:nowrap;}
+        .lab-title{font-size:14px;font-weight:600;flex:1;}
+        .tag{font-size:10px;padding:2px 7px;border-radius:10px;font-weight:600;text-transform:uppercase;}
+        .tag.java{background:rgba(248,152,32,.2);color:var(--java);}
+        .tag.spring{background:rgba(109,179,63,.2);color:var(--spring);}
+        .tag.blue{background:rgba(52,152,219,.2);color:var(--blue);}
+        .tag.green{background:rgba(46,204,113,.2);color:var(--green);}
+        .tag.orange{background:rgba(255,153,0,.2);color:var(--accent);}
+        .tag.purple{background:rgba(124,106,247,.2);color:var(--accent3);}
+        .tag.red{background:rgba(231,76,60,.2);color:var(--red);}
+        .tag.teal{background:rgba(0,199,183,.2);color:var(--accent2);}
+        .chevron{color:var(--muted);font-size:14px;transition:transform .2s;}
+        .lab.open .chevron{transform:rotate(180deg);}
+        .lab-body{display:none;padding:18px 22px;}
+        .lab.open .lab-body{display:block;}
+
+        h3{font-size:13px;color:var(--accent2);margin:16px 0 8px;display:flex;align-items:center;gap:6px;}
+        h3:first-child{margin-top:0;}
+        h4{font-size:12px;color:var(--yellow);margin:10px 0 5px;}
+        p{margin:5px 0;font-size:13px;}
+        ul,ol{padding-left:18px;margin:5px 0;}
+        li{margin:3px 0;font-size:13px;}
+
+        /* FILE TABS */
+        .file-tabs{display:flex;gap:0;margin-bottom:0;flex-wrap:wrap;}
+        .file-tab{background:var(--surface);border:1px solid var(--border);border-bottom:none;padding:5px 14px;font-size:11px;color:var(--muted);cursor:pointer;border-radius:5px 5px 0 0;margin-right:2px;}
+        .file-tab.active{background:var(--card);color:var(--java);border-bottom:1px solid var(--card);}
+        .file-content{display:none;}
+        .file-content.active{display:block;}
+
+        pre{background:#0d1117;border:1px solid var(--border);border-radius:0 5px 5px 5px;padding:12px 14px;overflow-x:auto;margin:0 0 8px;}
+        pre code{color:#e6edf3;font-family:'Consolas','Courier New',monospace;font-size:12px;}
+        /* Java syntax highlight classes */
+        .kw{color:#ff7b72;}   /* keywords */
+        .ty{color:#ffa657;}   /* types/classes */
+        .an{color:#d2a8ff;}   /* annotations */
+        .st{color:#a5d6ff;}   /* strings */
+        .cm{color:#8b949e;}   /* comments */
+        .nm{color:#79c0ff;}   /* method names */
+        .nu{color:#79c0ff;}   /* numbers */
+
+        code{background:#0d1117;color:#79c0ff;padding:1px 5px;border-radius:3px;font-family:'Consolas',monospace;font-size:12px;}
+
+        .steps{counter-reset:step;}
+        .step{counter-increment:step;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:10px 12px 10px 40px;margin:6px 0;position:relative;}
+        .step::before{content:counter(step);position:absolute;left:10px;top:10px;background:var(--java);color:#000;font-weight:700;font-size:10px;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;}
+
+        .tip{border-left:4px solid var(--accent);background:rgba(255,153,0,.07);padding:8px 12px;border-radius:0 5px 5px 0;margin:7px 0;font-size:12.5px;}
+        .tip.blue{border-left-color:var(--blue);background:rgba(52,152,219,.07);}
+        .tip.green{border-left-color:var(--green);background:rgba(46,204,113,.07);}
+        .tip.red{border-left-color:var(--red);background:rgba(231,76,60,.07);}
+        .tip.spring{border-left-color:var(--spring);background:rgba(109,179,63,.07);}
+        .tip strong{color:var(--accent);}
+        .tip.blue strong{color:var(--blue);}
+        .tip.green strong{color:var(--green);}
+        .tip.red strong{color:var(--red);}
+        .tip.spring strong{color:var(--spring);}
+
+        .verify{background:rgba(46,204,113,.06);border:1px solid rgba(46,204,113,.2);border-radius:6px;padding:10px 12px;margin:8px 0;}
+        .verify h4{color:var(--green);margin-top:0;}
+        .exam-box{background:rgba(124,106,247,.07);border:1px solid rgba(124,106,247,.2);border-radius:6px;padding:10px 12px;margin:8px 0;}
+        .exam-box h4{color:var(--accent3);margin-top:0;}
+        .java-note{background:rgba(248,152,32,.07);border:1px solid rgba(248,152,32,.2);border-radius:6px;padding:10px 12px;margin:8px 0;}
+        .java-note h4{color:var(--java);margin-top:0;}
+
+        table{width:100%;border-collapse:collapse;margin:7px 0;font-size:12.5px;}
+        th{background:var(--surface);color:var(--java);text-align:left;padding:6px 10px;border:1px solid var(--border);}
+        td{padding:5px 10px;border:1px solid var(--border);vertical-align:top;}
+        tr:nth-child(even) td{background:rgba(255,255,255,.02);}
+
+        .two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:8px 0;}
+        .dep-block{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:10px 12px;}
+        .dep-block h4{color:var(--spring);margin-top:0;margin-bottom:6px;}
+
+        @media(max-width:860px){nav{display:none;}main{margin-left:0;padding:12px;}.two-col{grid-template-columns:1fr;}}
+    </style>
+</head>
+<body>
+<nav>
+    <div class="logo">
+        <div class="title">☕ Java AWS Labs</div>
+        <div class="sub">Spring Boot + DVA-C02</div>
+    </div>
+    <div class="cat">Core Setup</div>
+    <a href="#jlab1">Lab 1 — AWS SDK v2 Setup</a>
+    <a href="#jlab2">Lab 2 — IAM + Credentials</a>
+    <div class="cat">Serverless</div>
+    <a href="#jlab3">Lab 3 — Lambda Handler</a>
+    <a href="#jlab4">Lab 4 — Lambda + API GW</a>
+    <a href="#jlab5">Lab 5 — Lambda + SQS DLQ</a>
+    <div class="cat">Database</div>
+    <a href="#jlab6">Lab 6 — DynamoDB SDK</a>
+    <a href="#jlab7">Lab 7 — DynamoDB Streams</a>
+    <a href="#jlab8">Lab 8 — RDS + Spring Data</a>
+    <a href="#jlab9">Lab 9 — ElastiCache Redis</a>
+    <div class="cat">Messaging</div>
+    <a href="#jlab10">Lab 10 — SQS Producer/Consumer</a>
+    <a href="#jlab11">Lab 11 — SNS Fan-Out</a>
+    <a href="#jlab12">Lab 12 — Kinesis Producer</a>
+    <div class="cat">Storage</div>
+    <a href="#jlab13">Lab 13 — S3 Operations</a>
+    <div class="cat">Monitoring</div>
+    <a href="#jlab14">Lab 14 — X-Ray Tracing</a>
+    <a href="#jlab15">Lab 15 — CloudWatch Metrics</a>
+    <div class="cat">Security</div>
+    <a href="#jlab16">Lab 16 — KMS + Secrets Manager</a>
+    <div class="cat">Containers</div>
+    <a href="#jlab17">Lab 17 — Spring Boot on ECS</a>
+    <div class="cat">CI/CD</div>
+    <a href="#jlab18">Lab 18 — CodeBuild for Java</a>
+</nav>
+
+<main>
+    <div class="hero">
+        <div class="hero-text">
+            <h1>☕ AWS DVA-C02 — Java & Spring Boot Labs</h1>
+            <p>All labs use Java 17+ with AWS SDK v2 and Spring Boot 3.x. Each lab maps directly to DVA-C02 exam topics with real, runnable Java code.</p>
+            <div class="hero-badges">
+                <span class="badge java">Java 17+</span>
+                <span class="badge spring">Spring Boot 3.x</span>
+                <span class="badge aws">AWS SDK v2</span>
+                <span class="badge spring">Spring Cloud AWS</span>
+                <span class="badge java">Maven / Gradle</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== LAB 1 ===== -->
+    <div class="lab" id="jlab1">
+        <div class="lab-header" onclick="toggle(this)">
+            <span class="lab-num">Lab 1</span>
+            <span class="lab-title">AWS SDK v2 — Project Setup & Credential Chain</span>
+            <div style="display:flex;gap:6px"><span class="tag java">Java 17</span><span class="tag spring">Spring Boot</span><span class="tag orange">SDK v2</span></div>
+            <span class="chevron">▼</span>
+        </div>
+        <div class="lab-body">
+            <p>Set up a Spring Boot project with AWS SDK v2, understand the credential provider chain, and configure clients correctly for both local dev and AWS environments.</p>
+
+            <h3>📦 Maven Dependencies (pom.xml)</h3>
+            <div class="dep-block">
+                <h4>pom.xml — AWS SDK v2 BOM</h4>
+                <pre><code>&lt;dependencyManagement&gt;
+  &lt;dependencies&gt;
+    &lt;!-- AWS SDK v2 BOM — manages all SDK versions --&gt;
+    &lt;dependency&gt;
+      &lt;groupId&gt;software.amazon.awssdk&lt;/groupId&gt;
+      &lt;artifactId&gt;bom&lt;/artifactId&gt;
+      &lt;version&gt;2.25.0&lt;/version&gt;
+      &lt;type&gt;pom&lt;/type&gt;
+      &lt;scope&gt;import&lt;/scope&gt;
+    &lt;/dependency&gt;
+  &lt;/dependencies&gt;
+&lt;/dependencyManagement&gt;
+
+&lt;dependencies&gt;
+  &lt;!-- Spring Boot --&gt;
+  &lt;dependency&gt;
+    &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+    &lt;artifactId&gt;spring-boot-starter-web&lt;/artifactId&gt;
+  &lt;/dependency&gt;
+
+  &lt;!-- AWS SDK v2 services (no version needed — BOM manages it) --&gt;
+  &lt;dependency&gt;
+    &lt;groupId&gt;software.amazon.awssdk&lt;/groupId&gt;
+    &lt;artifactId&gt;s3&lt;/artifactId&gt;
+  &lt;/dependency&gt;
+  &lt;dependency&gt;
+    &lt;groupId&gt;software.amazon.awssdk&lt;/groupId&gt;
+    &lt;artifactId&gt;dynamodb&lt;/artifactId&gt;
+  &lt;/dependency&gt;
+  &lt;dependency&gt;
+    &lt;groupId&gt;software.amazon.awssdk&lt;/groupId&gt;
+    &lt;artifactId&gt;sqs&lt;/artifactId&gt;
+  &lt;/dependency&gt;
+  &lt;dependency&gt;
+    &lt;groupId&gt;software.amazon.awssdk&lt;/groupId&gt;
+    &lt;artifactId&gt;sns&lt;/artifactId&gt;
+  &lt;/dependency&gt;
+  &lt;dependency&gt;
+    &lt;groupId&gt;software.amazon.awssdk&lt;/groupId&gt;
+    &lt;artifactId&gt;secretsmanager&lt;/artifactId&gt;
+  &lt;/dependency&gt;
+  &lt;dependency&gt;
+    &lt;groupId&gt;software.amazon.awssdk&lt;/groupId&gt;
+    &lt;artifactId&gt;kms&lt;/artifactId&gt;
+  &lt;/dependency&gt;
+&lt;/dependencies&gt;</code></pre>
+            </div>
+
+            <h3>⚙️ AWS Client Configuration Bean</h3>
+            <pre><code><span class="an">@Configuration</span>
+<span class="kw">public class</span> <span class="ty">AwsConfig</span> {
+
+    <span class="an">@Value</span>(<span class="st">"${aws.region:us-east-1}"</span>)
+    <span class="kw">private</span> <span class="ty">String</span> region;
+
+    <span class="cm">/**
+     * Credential Provider Chain (in order):
+     * 1. Environment variables: AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
+     * 2. Java system properties: aws.accessKeyId, aws.secretAccessKey
+     * 3. ~/.aws/credentials file (local dev)
+     * 4. EC2 Instance Profile / ECS Task Role / Lambda execution role
+     *
+     * NEVER hardcode credentials — the chain handles everything automatically.
+     */</span>
+    <span class="an">@Bean</span>
+    <span class="kw">public</span> <span class="ty">S3Client</span> <span class="nm">s3Client</span>() {
+        <span class="kw">return</span> <span class="ty">S3Client</span>.builder()
+            .region(<span class="ty">Region</span>.of(region))
+            .credentialsProvider(<span class="ty">DefaultCredentialsProvider</span>.create()) <span class="cm">// uses chain</span>
+            .build();
+    }
+
+    <span class="an">@Bean</span>
+    <span class="kw">public</span> <span class="ty">DynamoDbClient</span> <span class="nm">dynamoDbClient</span>() {
+        <span class="kw">return</span> <span class="ty">DynamoDbClient</span>.builder()
+            .region(<span class="ty">Region</span>.of(region))
+            .credentialsProvider(<span class="ty">DefaultCredentialsProvider</span>.create())
+            .build();
+    }
+
+    <span class="an">@Bean</span>
+    <span class="kw">public</span> <span class="ty">SqsClient</span> <span class="nm">sqsClient</span>() {
+        <span class="kw">return</span> <span class="ty">SqsClient</span>.builder()
+            .region(<span class="ty">Region</span>.of(region))
+            .credentialsProvider(<span class="ty">DefaultCredentialsProvider</span>.create())
+            .build();
+    }
+}</code></pre>
+
+            <h3>⚙️ application.properties</h3>
+            <pre><code># Local dev — region only, credentials from ~/.aws/credentials
+aws.region=us-east-1
+
+# On EC2/Lambda/ECS — credentials come from IAM Role automatically
+# No access keys needed in config!</code></pre>
+
+            <div class="tip red"><strong>NEVER put AWS_ACCESS_KEY_ID in application.properties or code.</strong> Use IAM Roles for EC2/Lambda/ECS. Use ~/.aws/credentials for local dev only.</div>
+
+            <h3>🔄 Exponential Backoff (SDK v2 built-in)</h3>
+            <pre><code><span class="cm">// SDK v2 has retry built-in. Customize if needed:</span>
+<span class="ty">RetryPolicy</span> retryPolicy = <span class="ty">RetryPolicy</span>.builder()
+    .numRetries(<span class="nu">5</span>)
+    .retryCondition(<span class="ty">RetryCondition</span>.defaultRetryCondition())
+    .backoffStrategy(<span class="ty">BackoffStrategy</span>.defaultStrategy()) <span class="cm">// exponential backoff</span>
+    .build();
+
+<span class="ty">S3Client</span> s3 = <span class="ty">S3Client</span>.builder()
+    .region(<span class="ty">Region</span>.US_EAST_1)
+    .overrideConfiguration(c -> c.retryPolicy(retryPolicy))
+    .build();</code></pre>
+
+            <div class="exam-box">
+                <h4>🎓 Exam Insights</h4>
+                <ul>
+                    <li>Default region if not configured: <strong>us-east-1</strong></li>
+                    <li>SDK v2 uses <code>DefaultCredentialsProvider</code> — checks env vars → ~/.aws → IAM Role</li>
+                    <li>Exponential backoff for HTTP 429 (throttling) — built into SDK</li>
+                    <li>AWS CLI uses Python SDK (boto3) — Java uses AWS SDK for Java v2</li>
+                    <li>Use IAM Roles for EC2/Lambda/ECS — never hardcode credentials</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== LAB 2 ===== -->
+    <div class="lab" id="jlab2">
+        <div class="lab-header" onclick="toggle(this)">
+            <span class="lab-num">Lab 2</span>
+            <span class="lab-title">IAM — Roles, Policies & STS AssumeRole in Java</span>
+            <div style="display:flex;gap:6px"><span class="tag java">Java</span><span class="tag orange">IAM</span><span class="tag blue">STS</span></div>
+            <span class="chevron">▼</span>
+        </div>
+        <div class="lab-body">
+            <p>Use STS to assume a cross-account role, decode authorization errors, and implement fine-grained IAM policy checks in Java.</p>
+
+            <h3>🔐 STS AssumeRole — Cross-Account Access</h3>
+            <pre><code><span class="an">@Service</span>
+<span class="kw">public class</span> <span class="ty">CrossAccountService</span> {
+
+    <span class="kw">private final</span> <span class="ty">StsClient</span> stsClient;
+
+    <span class="kw">public</span> <span class="ty">CrossAccountService</span>() {
+        <span class="kw">this</span>.stsClient = <span class="ty">StsClient</span>.builder()
+            .region(<span class="ty">Region</span>.US_EAST_1)
+            .build();
+    }
+
+    <span class="cm">/**
+     * Assume a role in another AWS account.
+     * Use case: your app in Account A needs to access S3 in Account B.
+     * NEVER share credentials — use AssumeRole instead.
+     */</span>
+    <span class="kw">public</span> <span class="ty">AwsCredentialsProvider</span> <span class="nm">assumeRole</span>(<span class="ty">String</span> roleArn, <span class="ty">String</span> sessionName) {
+        <span class="ty">AssumeRoleRequest</span> request = <span class="ty">AssumeRoleRequest</span>.builder()
+            .roleArn(roleArn)                    <span class="cm">// "arn:aws:iam::OTHER_ACCOUNT:role/MyRole"</span>
+            .roleSessionName(sessionName)         <span class="cm">// "my-app-session"</span>
+            .durationSeconds(<span class="nu">3600</span>)              <span class="cm">// 1 hour max by default</span>
+            .build();
+
+        <span class="ty">AssumeRoleResponse</span> response = stsClient.assumeRole(request);
+        <span class="ty">Credentials</span> creds = response.credentials();
+
+        <span class="kw">return</span> <span class="ty">StaticCredentialsProvider</span>.create(
+            <span class="ty">AwsSessionCredentials</span>.create(
+                creds.accessKeyId(),
+                creds.secretAccessKey(),
+                creds.sessionToken()             <span class="cm">// session token required for temp creds</span>
+            )
+        );
+    }
+
+    <span class="cm">// Use the assumed role credentials to access another account's S3</span>
+    <span class="kw">public</span> <span class="ty">List</span>&lt;<span class="ty">String</span>&gt; <span class="nm">listBucketsInOtherAccount</span>(<span class="ty">String</span> roleArn) {
+        <span class="ty">AwsCredentialsProvider</span> crossAccountCreds = assumeRole(roleArn, <span class="st">"list-buckets"</span>);
+
+        <span class="ty">S3Client</span> crossAccountS3 = <span class="ty">S3Client</span>.builder()
+            .region(<span class="ty">Region</span>.US_EAST_1)
+            .credentialsProvider(crossAccountCreds)
+            .build();
+
+        <span class="kw">return</span> crossAccountS3.listBuckets().buckets().stream()
+            .map(<span class="ty">Bucket</span>::name)
+            .collect(<span class="ty">Collectors</span>.toList());
+    }
+}</code></pre>
+
+            <h3>🔍 Decode Authorization Error (STS)</h3>
+            <pre><code><span class="kw">public</span> <span class="ty">String</span> <span class="nm">decodeAuthorizationError</span>(<span class="ty">String</span> encodedMessage) {
+    <span class="ty">DecodeAuthorizationMessageRequest</span> request =
+        <span class="ty">DecodeAuthorizationMessageRequest</span>.builder()
+            .encodedMessage(encodedMessage)
+            .build();
+
+    <span class="ty">DecodeAuthorizationMessageResponse</span> response =
+        stsClient.decodeAuthorizationMessage(request);
+
+    <span class="kw">return</span> response.decodedMessage(); <span class="cm">// Human-readable error</span>
+    <span class="cm">// Note: caller needs sts:DecodeAuthorizationMessage permission</span>
+}</code></pre>
+
+            <div class="exam-box">
+                <h4>🎓 Exam Insights</h4>
+                <ul>
+                    <li>Cross-account access: use IAM Role + STS AssumeRole — never share credentials</li>
+                    <li>Session token is required when using temporary credentials</li>
+                    <li>Decode authorization errors: caller needs <code>sts:DecodeAuthorizationMessage</code> permission</li>
+                    <li>Permissions boundary = max cap on identity-based policies</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== LAB 3 ===== -->
+    <div class="lab" id="jlab3">
+        <div class="lab-header" onclick="toggle(this)">
+            <span class="lab-num">Lab 3</span>
+            <span class="lab-title">Lambda — Java Handler, Context & Cold Start Optimization</span>
+            <div style="display:flex;gap:6px"><span class="tag java">Java 17</span><span class="tag green">Lambda</span></div>
+            <span class="chevron">▼</span>
+        </div>
+        <div class="lab-body">
+            <p>Write a production-ready Java Lambda handler, optimize for cold starts, use environment variables, and handle errors correctly.</p>
+
+            <h3>📦 Lambda Maven Dependency</h3>
+            <pre><code>&lt;dependency&gt;
+  &lt;groupId&gt;com.amazonaws&lt;/groupId&gt;
+  &lt;artifactId&gt;aws-lambda-java-core&lt;/artifactId&gt;
+  &lt;version&gt;1.2.3&lt;/version&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+  &lt;groupId&gt;com.amazonaws&lt;/groupId&gt;
+  &lt;artifactId&gt;aws-lambda-java-events&lt;/artifactId&gt;
+  &lt;version&gt;3.11.4&lt;/version&gt;
+&lt;/dependency&gt;
+&lt;!-- For JSON serialization --&gt;
+&lt;dependency&gt;
+  &lt;groupId&gt;com.fasterxml.jackson.core&lt;/groupId&gt;
+  &lt;artifactId&gt;jackson-databind&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+
+            <h3>☕ Lambda Handler — Best Practices</h3>
+            <pre><code><span class="cm">/**
+ * Java Lambda Handler — Production Pattern
+ *
+ * KEY RULE: Initialize expensive resources OUTSIDE the handler method.
+ * The execution context is reused across invocations (warm starts).
+ * Static fields and constructor code run only on cold start.
+ */</span>
+<span class="kw">public class</span> <span class="ty">OrderHandler</span> <span class="kw">implements</span> <span class="ty">RequestHandler</span>&lt;<span class="ty">APIGatewayProxyRequestEvent</span>, <span class="ty">APIGatewayProxyResponseEvent</span>&gt; {
+
+    <span class="cm">// ✅ GOOD: initialized once on cold start, reused on warm invocations</span>
+    <span class="kw">private static final</span> <span class="ty">DynamoDbClient</span> dynamoDb;
+    <span class="kw">private static final</span> <span class="ty">ObjectMapper</span> objectMapper;
+    <span class="kw">private static final</span> <span class="ty">String</span> TABLE_NAME;
+
+    <span class="kw">static</span> {
+        <span class="cm">// Static initializer = runs once per container (cold start only)</span>
+        TABLE_NAME = <span class="ty">System</span>.getenv(<span class="st">"TABLE_NAME"</span>);  <span class="cm">// from Lambda env vars</span>
+        dynamoDb = <span class="ty">DynamoDbClient</span>.builder()
+            .region(<span class="ty">Region</span>.of(<span class="ty">System</span>.getenv(<span class="st">"AWS_REGION"</span>)))
+            .build();
+        objectMapper = <span class="kw">new</span> <span class="ty">ObjectMapper</span>();
+    }
+
+    <span class="an">@Override</span>
+    <span class="kw">public</span> <span class="ty">APIGatewayProxyResponseEvent</span> <span class="nm">handleRequest</span>(
+            <span class="ty">APIGatewayProxyRequestEvent</span> event,
+            <span class="ty">Context</span> context) {
+
+        <span class="cm">// context.getLogger() writes to CloudWatch Logs</span>
+        context.getLogger().log(<span class="st">"RequestId: "</span> + context.getAwsRequestId());
+        context.getLogger().log(<span class="st">"Remaining time: "</span> + context.getRemainingTimeInMillis() + <span class="st">"ms"</span>);
+
+        <span class="kw">try</span> {
+            <span class="ty">OrderRequest</span> order = objectMapper.readValue(event.getBody(), <span class="ty">OrderRequest</span>.<span class="kw">class</span>);
+
+            <span class="cm">// Process order using pre-initialized DynamoDB client</span>
+            <span class="ty">Map</span>&lt;<span class="ty">String</span>, <span class="ty">AttributeValue</span>&gt; item = <span class="ty">Map</span>.of(
+                <span class="st">"orderId"</span>, <span class="ty">AttributeValue</span>.fromS(context.getAwsRequestId()),
+                <span class="st">"customerId"</span>, <span class="ty">AttributeValue</span>.fromS(order.getCustomerId()),
+                <span class="st">"amount"</span>, <span class="ty">AttributeValue</span>.fromN(order.getAmount().toString()),
+                <span class="st">"status"</span>, <span class="ty">AttributeValue</span>.fromS(<span class="st">"PENDING"</span>)
+            );
+
+            dynamoDb.putItem(r -> r.tableName(TABLE_NAME).item(item));
+
+            <span class="kw">return</span> response(<span class="nu">201</span>, <span class="st">"{\"orderId\":\""</span> + context.getAwsRequestId() + <span class="st">"\"}"</span>);
+
+        } <span class="kw">catch</span> (<span class="ty">Exception</span> e) {
+            context.getLogger().log(<span class="st">"ERROR: "</span> + e.getMessage());
+            <span class="kw">return</span> response(<span class="nu">500</span>, <span class="st">"{\"error\":\"Internal server error\"}"</span>);
+        }
+    }
+
+    <span class="kw">private</span> <span class="ty">APIGatewayProxyResponseEvent</span> <span class="nm">response</span>(<span class="kw">int</span> statusCode, <span class="ty">String</span> body) {
+        <span class="kw">return new</span> <span class="ty">APIGatewayProxyResponseEvent</span>()
+            .withStatusCode(statusCode)
+            .withHeaders(<span class="ty">Map</span>.of(<span class="st">"Content-Type"</span>, <span class="st">"application/json"</span>,
+                                  <span class="st">"Access-Control-Allow-Origin"</span>, <span class="st">"*"</span>))
+            .withBody(body);
+    }
+}</code></pre>
+
+            <h3>📦 Build Fat JAR for Lambda</h3>
+            <pre><code>&lt;!-- Maven Shade Plugin — creates fat JAR with all dependencies --&gt;
+&lt;plugin&gt;
+  &lt;groupId&gt;org.apache.maven.plugins&lt;/groupId&gt;
+  &lt;artifactId&gt;maven-shade-plugin&lt;/artifactId&gt;
+  &lt;version&gt;3.5.0&lt;/version&gt;
+  &lt;executions&gt;
+    &lt;execution&gt;
+      &lt;phase&gt;package&lt;/phase&gt;
+      &lt;goals&gt;&lt;goal&gt;shade&lt;/goal&gt;&lt;/goals&gt;
+      &lt;configuration&gt;
+        &lt;createDependencyReducedPom&gt;false&lt;/createDependencyReducedPom&gt;
+      &lt;/configuration&gt;
+    &lt;/execution&gt;
+  &lt;/executions&gt;
+&lt;/plugin&gt;</code></pre>
+
+            <div class="steps">
+                <div class="step"><strong>Build and deploy</strong>
+                    <pre><code>mvn clean package -DskipTests
+
+aws lambda create-function \
+  --function-name order-handler \
+  --runtime java17 \
+  --handler com.myapp.OrderHandler::handleRequest \
+  --role arn:aws:iam::ACCOUNT:role/LambdaRole \
+  --zip-file fileb://target/order-handler-1.0-SNAPSHOT.jar \
+  --timeout 30 \
+  --memory-size 512 \
+  --environment Variables={TABLE_NAME=Orders}</code></pre>
+                </div>
+            </div>
+
+            <div class="java-note">
+                <h4>☕ Java Cold Start Tips</h4>
+                <ul>
+                    <li>Java has longer cold starts than Python/Node — use <strong>Provisioned Concurrency</strong> for latency-sensitive functions</li>
+                    <li>Initialize SDK clients in <code>static</code> blocks — reused across warm invocations</li>
+                    <li>Use <strong>GraalVM Native Image</strong> (via Spring Native) for near-zero cold starts</li>
+                    <li>Increase memory → more vCPU → faster initialization</li>
+                    <li>At 1792MB Lambda gets 1 full vCPU; above that = multiple vCPUs (use multithreading)</li>
+                </ul>
+            </div>
+
+            <div class="exam-box">
+                <h4>🎓 Exam Insights</h4>
+                <ul>
+                    <li>Lambda timeout: default 3s, max <strong>15 minutes (900s)</strong></li>
+                    <li>Memory: 128MB–10GB; increasing RAM also increases CPU</li>
+                    <li>Initialize DB connections outside handler — reused on warm starts</li>
+                    <li>Env variables: 4KB limit; encrypt with KMS for secrets</li>
+                    <li>Deployment package: 50MB compressed, 250MB uncompressed (use S3 for larger)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== LAB 4 ===== -->
+    <div class="lab" id="jlab4">
+        <div class="lab-header" onclick="toggle(this)">
+            <span class="lab-num">Lab 4</span>
+            <span class="lab-title">Lambda + API Gateway — Spring Boot Serverless with aws-serverless-java-container</span>
+            <div style="display:flex;gap:6px"><span class="tag spring">Spring Boot</span><span class="tag green">Lambda</span><span class="tag blue">API GW</span></div>
+            <span class="chevron">▼</span>
+        </div>
+        <div class="lab-body">
+            <p>Run a full Spring Boot REST application inside Lambda using the <code>aws-serverless-java-container</code> library. This lets you reuse your existing Spring controllers.</p>
+
+            <h3>📦 Dependencies</h3>
+            <pre><code>&lt;dependency&gt;
+  &lt;groupId&gt;com.amazonaws.serverless&lt;/groupId&gt;
+  &lt;artifactId&gt;aws-serverless-java-container-springboot3&lt;/artifactId&gt;
+  &lt;version&gt;2.0.0&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+
+            <h3>☕ Lambda Handler wrapping Spring Boot</h3>
+            <pre><code><span class="cm">/**
+ * StreamLambdaHandler — bridges API Gateway events to Spring Boot.
+ * Spring context is initialized ONCE on cold start (static block).
+ */</span>
+<span class="kw">public class</span> <span class="ty">StreamLambdaHandler</span> <span class="kw">implements</span> <span class="ty">RequestStreamHandler</span> {
+
+    <span class="kw">private static final</span> <span class="ty">SpringBootLambdaContainerHandler</span>&lt;<span class="ty">AwsProxyRequest</span>, <span class="ty">AwsProxyResponse</span>&gt; handler;
+
+    <span class="kw">static</span> {
+        <span class="kw">try</span> {
+            <span class="cm">// Cold start: initialize Spring context once</span>
+            handler = <span class="ty">SpringBootLambdaContainerHandler</span>
+                .getAwsProxyHandler(<span class="ty">Application</span>.<span class="kw">class</span>);
+        } <span class="kw">catch</span> (<span class="ty">ContainerInitializationException</span> e) {
+            <span class="kw">throw new</span> <span class="ty">RuntimeException</span>(<span class="st">"Failed to initialize Spring Boot"</span>, e);
+        }
+    }
+
+    <span class="an">@Override</span>
+    <span class="kw">public void</span> <span class="nm">handleRequest</span>(<span class="ty">InputStream</span> inputStream,
+                               <span class="ty">OutputStream</span> outputStream,
+                               <span class="ty">Context</span> context) <span class="kw">throws</span> <span class="ty">IOException</span> {
+        handler.proxyStream(inputStream, outputStream, context);
+    }
+}</code></pre>
+
+            <h3>☕ Spring Boot Application (unchanged from regular Spring Boot)</h3>
+            <pre><code><span class="an">@SpringBootApplication</span>
+<span class="kw">public class</span> <span class="ty">Application</span> {
+    <span class="kw">public static void</span> <span class="nm">main</span>(<span class="ty">String</span>[] args) {
+        <span class="ty">SpringApplication</span>.run(<span class="ty">Application</span>.<span class="kw">class</span>, args);
+    }
+}
+
+<span class="an">@RestController</span>
+<span class="an">@RequestMapping</span>(<span class="st">"/orders"</span>)
+<span class="kw">public class</span> <span class="ty">OrderController</span> {
+
+    <span class="kw">private final</span> <span class="ty">OrderService</span> orderService;
+
+    <span class="kw">public</span> <span class="ty">OrderController</span>(<span class="ty">OrderService</span> orderService) {
+        <span class="kw">this</span>.orderService = orderService;
+    }
+
+    <span class="an">@PostMapping</span>
+    <span class="kw">public</span> <span class="ty">ResponseEntity</span>&lt;<span class="ty">OrderResponse</span>&gt; <span class="nm">createOrder</span>(<span class="an">@RequestBody</span> <span class="ty">OrderRequest</span> request) {
+        <span class="ty">OrderResponse</span> order = orderService.createOrder(request);
+        <span class="kw">return</span> <span class="ty">ResponseEntity</span>.status(<span class="ty">HttpStatus</span>.CREATED).body(order);
+    }
+
+    <span class="an">@GetMapping</span>(<span class="st">"/{orderId}"</span>)
+    <span class="kw">public</span> <span class="ty">ResponseEntity</span>&lt;<span class="ty">OrderResponse</span>&gt; <span class="nm">getOrder</span>(<span class="an">@PathVariable</span> <span class="ty">String</span> orderId) {
+        <span class="kw">return</span> orderService.findById(orderId)
+            .map(<span class="ty">ResponseEntity</span>::ok)
+            .orElse(<span class="ty">ResponseEntity</span>.notFound().build());
+    }
+}</code></pre>
+
+            <h3>☕ Lambda Versions & Aliases in Java</h3>
+            <pre><code><span class="cm">// Publish a new version and update alias via SDK</span>
+<span class="ty">LambdaClient</span> lambda = <span class="ty">LambdaClient</span>.builder().region(<span class="ty">Region</span>.US_EAST_1).build();
+
+<span class="cm">// Publish version from $LATEST</span>
+<span class="ty">PublishVersionResponse</span> version = lambda.publishVersion(r -> r
+    .functionName(<span class="st">"order-handler"</span>)
+    .description(<span class="st">"v2 - added validation"</span>));
+
+<span class="ty">String</span> newVersion = version.version(); <span class="cm">// e.g., "3"</span>
+
+<span class="cm">// Canary: 10% to new version, 90% to current prod</span>
+lambda.updateAlias(r -> r
+    .functionName(<span class="st">"order-handler"</span>)
+    .name(<span class="st">"prod"</span>)
+    .functionVersion(<span class="st">"2"</span>)                    <span class="cm">// current prod version</span>
+    .routingConfig(rc -> rc
+        .additionalVersionWeights(<span class="ty">Map</span>.of(newVersion, <span class="nu">0.1</span>)))); <span class="cm">// 10% to v3</span></code></pre>
+
+            <div class="exam-box">
+                <h4>🎓 Exam Insights</h4>
+                <ul>
+                    <li>Versions are immutable after publishing — cannot change code or env vars</li>
+                    <li>Aliases are mutable pointers — can update which version they point to</li>
+                    <li><strong>Aliases cannot reference other aliases</strong></li>
+                    <li>Weighted routing on alias = canary deployment</li>
+                    <li>API Gateway stage variable: <code>${stageVariables.lambdaAlias}</code> routes to correct alias</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== LAB 5 ===== -->
+    <div class="lab" id="jlab5">
+        <div class="lab-header" onclick="toggle(this)">
+            <span class="lab-num">Lab 5</span>
+            <span class="lab-title">Lambda + SQS — Java Event Source Mapping & Idempotency</span>
+            <div style="display:flex;gap:6px"><span class="tag java">Java</span><span class="tag green">Lambda</span><span class="tag teal">SQS</span></div>
+            <span class="chevron">▼</span>
+        </div>
+        <div class="lab-body">
+            <p>Process SQS messages in Java Lambda with proper error handling, idempotency, and batch item failure reporting.</p>
+
+            <h3>☕ SQS Lambda Handler (Java)</h3>
+            <pre><code><span class="kw">public class</span> <span class="ty">SqsOrderProcessor</span> <span class="kw">implements</span> <span class="ty">RequestHandler</span>&lt;<span class="ty">SQSEvent</span>, <span class="ty">SQSBatchResponse</span>&gt; {
+
+    <span class="kw">private static final</span> <span class="ty">DynamoDbClient</span> dynamoDb = <span class="ty">DynamoDbClient</span>.create();
+    <span class="kw">private static final</span> <span class="ty">ObjectMapper</span> mapper = <span class="kw">new</span> <span class="ty">ObjectMapper</span>();
+
+    <span class="an">@Override</span>
+    <span class="kw">public</span> <span class="ty">SQSBatchResponse</span> <span class="nm">handleRequest</span>(<span class="ty">SQSEvent</span> event, <span class="ty">Context</span> context) {
+        <span class="ty">List</span>&lt;<span class="ty">SQSBatchResponse.BatchItemFailure</span>&gt; failures = <span class="kw">new</span> <span class="ty">ArrayList</span>&lt;&gt;();
+
+        <span class="kw">for</span> (<span class="ty">SQSEvent.SQSMessage</span> message : event.getRecords()) {
+            <span class="kw">try</span> {
+                processMessage(message, context);
+                <span class="cm">// Lambda auto-deletes successfully processed messages from SQS</span>
+            } <span class="kw">catch</span> (<span class="ty">Exception</span> e) {
+                context.getLogger().log(<span class="st">"Failed to process: "</span> + message.getMessageId() + <span class="st">" - "</span> + e.getMessage());
+                <span class="cm">// Report this specific message as failed — others in batch still succeed</span>
+                failures.add(<span class="ty">SQSBatchResponse.BatchItemFailure</span>.builder()
+                    .withItemIdentifier(message.getMessageId())
+                    .build());
+            }
+        }
+
+        <span class="cm">// Return failed items — they go back to queue (or DLQ after MaxReceives)</span>
+        <span class="kw">return</span> <span class="ty">SQSBatchResponse</span>.builder()
+            .withBatchItemFailures(failures)
+            .build();
+    }
+
+    <span class="kw">private void</span> <span class="nm">processMessage</span>(<span class="ty">SQSEvent.SQSMessage</span> message, <span class="ty">Context</span> context) <span class="kw">throws</span> <span class="ty">Exception</span> {
+        <span class="ty">OrderEvent</span> order = mapper.readValue(message.getBody(), <span class="ty">OrderEvent</span>.<span class="kw">class</span>);
+
+        <span class="cm">// Idempotency check — use messageId as deduplication key</span>
+        <span class="kw">if</span> (isAlreadyProcessed(message.getMessageId())) {
+            context.getLogger().log(<span class="st">"Skipping duplicate: "</span> + message.getMessageId());
+            <span class="kw">return</span>;
+        }
+
+        <span class="cm">// Process the order</span>
+        saveOrder(order);
+        markAsProcessed(message.getMessageId());
+    }
+
+    <span class="kw">private boolean</span> <span class="nm">isAlreadyProcessed</span>(<span class="ty">String</span> messageId) {
+        <span class="kw">try</span> {
+            <span class="ty">GetItemResponse</span> result = dynamoDb.getItem(r -> r
+                .tableName(<span class="st">"ProcessedMessages"</span>)
+                .key(<span class="ty">Map</span>.of(<span class="st">"messageId"</span>, <span class="ty">AttributeValue</span>.fromS(messageId))));
+            <span class="kw">return</span> result.hasItem();
+        } <span class="kw">catch</span> (<span class="ty">Exception</span> e) {
+            <span class="kw">return false</span>;
+        }
+    }
+}</code></pre>
+
+            <div class="tip red"><strong>SQS DLQ goes on the SQS queue, NOT on the Lambda function.</strong> Lambda DLQ is only for async invocations (S3, SNS triggers).</div>
+            <div class="tip spring"><strong>Spring Cloud AWS</strong> alternative: use <code>@SqsListener</code> annotation for cleaner SQS consumption in Spring Boot apps running on EC2/ECS.</div>
+
+            <div class="exam-box">
+                <h4>🎓 Exam Insights</h4>
+                <ul>
+                    <li>Visibility timeout = 6× Lambda timeout (e.g., Lambda 30s → SQS 180s)</li>
+                    <li><code>SQSBatchResponse</code> with <code>BatchItemFailures</code> = partial batch failure reporting</li>
+                    <li>Lambda function should be idempotent — retries must produce same result</li>
+                    <li>Lambda scales: adds 60 instances/min for standard SQS, up to 1000 concurrent</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== LAB 6 ===== -->
+    <div class="lab" id="jlab6">
+        <div class="lab-header" onclick="toggle(this)">
+            <span class="lab-num">Lab 6</span>
+            <span class="lab-title">DynamoDB — AWS SDK v2 CRUD, Pagination & Enhanced Client</span>
+            <div style="display:flex;gap:6px"><span class="tag java">Java</span><span class="tag teal">DynamoDB</span><span class="tag spring">Spring Boot</span></div>
+            <span class="chevron">▼</span>
+        </div>
+        <div class="lab-body">
+            <p>Use the DynamoDB Enhanced Client (type-safe, annotation-based) and low-level SDK for all CRUD operations, pagination, and conditional writes.</p>
+
+            <h3>☕ DynamoDB Enhanced Client — Entity Mapping</h3>
+            <pre><code><span class="cm">// Entity class with DynamoDB annotations</span>
+<span class="an">@DynamoDbBean</span>
+<span class="kw">public class</span> <span class="ty">Order</span> {
+
+    <span class="kw">private</span> <span class="ty">String</span> orderId;
+    <span class="kw">private</span> <span class="ty">String</span> customerId;
+    <span class="kw">private</span> <span class="ty">BigDecimal</span> amount;
+    <span class="kw">private</span> <span class="ty">String</span> status;
+    <span class="kw">private</span> <span class="ty">Long</span> expiresAt;  <span class="cm">// TTL attribute</span>
+
+    <span class="an">@DynamoDbPartitionKey</span>
+    <span class="kw">public</span> <span class="ty">String</span> <span class="nm">getOrderId</span>() { <span class="kw">return</span> orderId; }
+
+    <span class="an">@DynamoDbSortKey</span>
+    <span class="kw">public</span> <span class="ty">String</span> <span class="nm">getCustomerId</span>() { <span class="kw">return</span> customerId; }
+
+    <span class="an">@DynamoDbSecondaryPartitionKey</span>(indexNames = <span class="st">"status-index"</span>)
+    <span class="kw">public</span> <span class="ty">String</span> <span class="nm">getStatus</span>() { <span class="kw">return</span> status; }
+
+    <span class="cm">// getters/setters...</span>
+}</code></pre>
+
+            <h3>☕ Repository Service</h3>
+            <pre><code><span class="an">@Service</span>
+<span class="kw">public class</span> <span class="ty">OrderRepository</span> {
+
+    <span class="kw">private final</span> <span class="ty">DynamoDbTable</span>&lt;<span class="ty">Order</span>&gt; table;
+
+    <span class="kw">public</span> <span class="ty">OrderRepository</span>(<span class="ty">DynamoDbClient</span> dynamoDbClient) {
+        <span class="ty">DynamoDbEnhancedClient</span> enhancedClient = <span class="ty">DynamoDbEnhancedClient</span>.builder()
+            .dynamoDbClient(dynamoDbClient)
+            .build();
+        <span class="kw">this</span>.table = enhancedClient.table(<span class="st">"Orders"</span>, <span class="ty">TableSchema</span>.fromBean(<span class="ty">Order</span>.<span class="kw">class</span>));
+    }
+
+    <span class="cm">// CREATE / UPDATE</span>
+    <span class="kw">public void</span> <span class="nm">save</span>(<span class="ty">Order</span> order) {
+        <span class="cm">// Set TTL: expire in 24 hours</span>
+        order.setExpiresAt(<span class="ty">Instant</span>.now().plusSeconds(<span class="nu">86400</span>).getEpochSecond());
+        table.putItem(order);
+    }
+
+    <span class="cm">// READ by primary key</span>
+    <span class="kw">public</span> <span class="ty">Optional</span>&lt;<span class="ty">Order</span>&gt; <span class="nm">findById</span>(<span class="ty">String</span> orderId, <span class="ty">String</span> customerId) {
+        <span class="ty">Key</span> key = <span class="ty">Key</span>.builder()
+            .partitionValue(orderId)
+            .sortValue(customerId)
+            .build();
+        <span class="kw">return</span> <span class="ty">Optional</span>.ofNullable(table.getItem(key));
+    }
+
+    <span class="cm">// CONDITIONAL UPDATE — optimistic locking</span>
+    <span class="kw">public void</span> <span class="nm">updateStatus</span>(<span class="ty">String</span> orderId, <span class="ty">String</span> customerId,
+                              <span class="ty">String</span> expectedStatus, <span class="ty">String</span> newStatus) {
+        <span class="ty">Expression</span> condition = <span class="ty">Expression</span>.builder()
+            .expression(<span class="st">"#s = :expected"</span>)
+            .expressionNames(<span class="ty">Map</span>.of(<span class="st">"#s"</span>, <span class="st">"status"</span>))
+            .expressionValues(<span class="ty">Map</span>.of(<span class="st">":expected"</span>, <span class="ty">AttributeValue</span>.fromS(expectedStatus)))
+            .build();
+
+        <span class="ty">Order</span> order = <span class="kw">new</span> <span class="ty">Order</span>();
+        order.setOrderId(orderId);
+        order.setCustomerId(customerId);
+        order.setStatus(newStatus);
+
+        table.updateItem(r -> r.item(order).conditionExpression(condition));
+        <span class="cm">// Throws ConditionalCheckFailedException if status != expectedStatus</span>
+    }
+
+    <span class="cm">// QUERY with pagination</span>
+    <span class="kw">public</span> <span class="ty">List</span>&lt;<span class="ty">Order</span>&gt; <span class="nm">findByCustomer</span>(<span class="ty">String</span> customerId, <span class="kw">int</span> pageSize) {
+        <span class="ty">QueryConditional</span> queryConditional = <span class="ty">QueryConditional</span>
+            .keyEqualTo(k -> k.partitionValue(customerId));
+
+        <span class="ty">List</span>&lt;<span class="ty">Order</span>&gt; results = <span class="kw">new</span> <span class="ty">ArrayList</span>&lt;&gt;();
+        table.query(r -> r
+                .queryConditional(queryConditional)
+                .limit(pageSize))
+            .stream()
+            .flatMap(page -> page.items().stream())
+            .forEach(results::add);
+
+        <span class="kw">return</span> results;
+    }
+
+    <span class="cm">// BATCH WRITE — up to 25 items</span>
+    <span class="kw">public void</span> <span class="nm">batchSave</span>(<span class="ty">List</span>&lt;<span class="ty">Order</span>&gt; orders) {
+        <span class="ty">WriteBatch</span>.Builder</span>&lt;<span class="ty">Order</span>&gt; batchBuilder = <span class="ty">WriteBatch</span>.builder(<span class="ty">Order</span>.<span class="kw">class</span>)
+            .mappedTableResource(table);
+        orders.forEach(batchBuilder::addPutItem);
+
+        <span class="ty">DynamoDbEnhancedClient</span> enhancedClient = <span class="ty">DynamoDbEnhancedClient</span>.create();
+        enhancedClient.batchWriteItem(r -> r.writeBatches(batchBuilder.build()));
+    }
+}</code></pre>
+
+            <div class="exam-box">
+                <h4>🎓 Exam Insights</h4>
+                <ul>
+                    <li>WCU: 1 write/s per 1KB. RCU: 1 strong read/s per 4KB (eventual = 2 reads/s)</li>
+                    <li>GSI throttle = main table throttle — provision GSI WCU carefully</li>
+                    <li>Conditional writes = optimistic locking — throws <code>ConditionalCheckFailedException</code></li>
+                    <li>TTL: set epoch timestamp in Number attribute — deletion within 48 hours</li>
+                    <li>Transactions: 2× WCU/RCU cost</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== LAB 7 ===== -->
+    <div class="lab" id="jlab7">
+        <div class="lab-header" onclick="toggle(this)">
+            <span class="lab-num">Lab 7</span>
+            <span class="lab-title">DynamoDB Streams — Java Lambda Consumer</span>
+            <div style="display:flex;gap:6px"><span class="tag java">Java</span><span class="tag teal">DynamoDB</span><span class="tag green">Lambda</span></div>
+            <span class="chevron">▼</span>
+        </div>
+        <div class="lab-body">
+            <p>Process DynamoDB Streams events in Java Lambda to build event-driven pipelines (e.g., sync to Elasticsearch, send notifications on order changes).</p>
+
+            <h3>☕ DynamoDB Streams Lambda Handler</h3>
+            <pre><code><span class="kw">public class</span> <span class="ty">OrderStreamProcessor</span>
+        <span class="kw">implements</span> <span class="ty">RequestHandler</span>&lt;<span class="ty">DynamodbEvent</span>, <span class="ty">Void</span>&gt; {
+
+    <span class="kw">private static final</span> <span class="ty">SnsClient</span> sns = <span class="ty">SnsClient</span>.create();
+    <span class="kw">private static final</span> <span class="ty">String</span> TOPIC_ARN = <span class="ty">System</span>.getenv(<span class="st">"ORDER_EVENTS_TOPIC"</span>);
+
+    <span class="an">@Override</span>
+    <span class="kw">public</span> <span class="ty">Void</span> <span class="nm">handleRequest</span>(<span class="ty">DynamodbEvent</span> event, <span class="ty">Context</span> context) {
+
+        <span class="kw">for</span> (<span class="ty">DynamodbEvent.DynamodbStreamRecord</span> record : event.getRecords()) {
+            <span class="ty">String</span> eventName = record.getEventName(); <span class="cm">// INSERT, MODIFY, REMOVE</span>
+
+            <span class="kw">switch</span> (eventName) {
+                <span class="kw">case</span> <span class="st">"INSERT"</span>:
+                    handleNewOrder(record.getDynamodb().getNewImage(), context);
+                    <span class="kw">break</span>;
+                <span class="kw">case</span> <span class="st">"MODIFY"</span>:
+                    handleOrderUpdate(
+                        record.getDynamodb().getOldImage(),
+                        record.getDynamodb().getNewImage(),
+                        context);
+                    <span class="kw">break</span>;
+                <span class="kw">case</span> <span class="st">"REMOVE"</span>:
+                    handleOrderDeleted(record.getDynamodb().getOldImage(), context);
+                    <span class="kw">break</span>;
+            }
+        }
+        <span class="kw">return null</span>;
+    }
+
+    <span class="kw">private void</span> <span class="nm">handleNewOrder</span>(<span class="ty">Map</span>&lt;<span class="ty">String</span>, <span class="ty">AttributeValue</span>&gt; newImage, <span class="ty">Context</span> ctx) {
+        <span class="ty">String</span> orderId = newImage.get(<span class="st">"orderId"</span>).getS();
+        <span class="ty">String</span> customerId = newImage.get(<span class="st">"customerId"</span>).getS();
+
+        ctx.getLogger().log(<span class="st">"New order: "</span> + orderId + <span class="st">" for customer: "</span> + customerId);
+
+        <span class="cm">// Publish to SNS for fan-out processing</span>
+        sns.publish(r -> r
+            .topicArn(TOPIC_ARN)
+            .message(<span class="st">"{\"event\":\"ORDER_CREATED\",\"orderId\":\""</span> + orderId + <span class="st">"\"}"</span>)
+            .subject(<span class="st">"New Order"</span>));
+    }
+
+    <span class="kw">private void</span> <span class="nm">handleOrderUpdate</span>(
+            <span class="ty">Map</span>&lt;<span class="ty">String</span>, <span class="ty">AttributeValue</span>&gt; oldImage,
+            <span class="ty">Map</span>&lt;<span class="ty">String</span>, <span class="ty">AttributeValue</span>&gt; newImage,
+            <span class="ty">Context</span> ctx) {
+
+        <span class="ty">String</span> oldStatus = oldImage.get(<span class="st">"status"</span>).getS();
+        <span class="ty">String</span> newStatus = newImage.get(<span class="st">"status"</span>).getS();
+
+        <span class="kw">if</span> (!oldStatus.equals(newStatus)) {
+            ctx.getLogger().log(<span class="st">"Status changed: "</span> + oldStatus + <span class="st">" → "</span> + newStatus);
+            <span class="cm">// Trigger notification, update search index, etc.</span>
+        }
+    }
+}</code></pre>
+
+            <div class="tip blue"><strong>Stream types:</strong> KEYS_ONLY, NEW_IMAGE, OLD_IMAGE, NEW_AND_OLD_IMAGES. Choose based on what your processor needs — NEW_AND_OLD_IMAGES for change detection.</div>
+            <div class="exam-box">
+                <h4>🎓 Exam Insights</h4>
+                <ul>
+                    <li>DynamoDB Streams retention: <strong>24 hours fixed</strong> (cannot change)</li>
+                    <li>Lambda reads streams synchronously via event source mapping</li>
+                    <li>Records not retroactively added after enabling streams</li>
+                    <li>One Lambda invocation per shard (up to 10 parallel batches per shard)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== LAB 8 ===== -->
+    <div class="lab" id="jlab8">
+        <div class="lab-header" onclick="toggle(this)">
+            <span class="lab-num">Lab 8</span>
+            <span class="lab-title">RDS + Spring Data JPA — Connection Pooling & Read Replicas</span>
+            <div style="display:flex;gap:6px"><span class="tag spring">Spring Data JPA</span><span class="tag blue">RDS</span><span class="tag java">HikariCP</span></div>
+            <span class="chevron">▼</span>
+        </div>
+        <div class="lab-body">
+            <p>Connect Spring Boot to RDS MySQL with HikariCP connection pooling, configure read replicas for analytics, and use Secrets Manager for credentials.</p>
+
+            <h3>📦 Dependencies</h3>
+            <pre><code>&lt;dependency&gt;
+  &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+  &lt;artifactId&gt;spring-boot-starter-data-jpa&lt;/artifactId&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+  &lt;groupId&gt;com.mysql&lt;/groupId&gt;
+  &lt;artifactId&gt;mysql-connector-j&lt;/artifactId&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+  &lt;groupId&gt;software.amazon.awssdk&lt;/groupId&gt;
+  &lt;artifactId&gt;secretsmanager&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+
+            <h3>☕ Secrets Manager — Load DB Credentials at Startup</h3>
+            <pre><code><span class="an">@Configuration</span>
+<span class="kw">public class</span> <span class="ty">DatabaseConfig</span> {
+
+    <span class="kw">private static final</span> <span class="ty">SecretsManagerClient</span> secretsClient =
+        <span class="ty">SecretsManagerClient</span>.create();
+
+    <span class="cm">/**
+     * Load DB credentials from Secrets Manager.
+     * Cache the result — don't call Secrets Manager on every request!
+     */</span>
+    <span class="kw">private static</span> <span class="ty">DbCredentials</span> cachedCredentials;
+
+    <span class="kw">private static</span> <span class="ty">DbCredentials</span> <span class="nm">getCredentials</span>() {
+        <span class="kw">if</span> (cachedCredentials == <span class="kw">null</span>) {
+            <span class="ty">GetSecretValueResponse</span> response = secretsClient.getSecretValue(r -> r
+                .secretId(<span class="st">"prod/myapp/db"</span>));
+
+            cachedCredentials = <span class="kw">new</span> <span class="ty">ObjectMapper</span>()
+                .readValue(response.secretString(), <span class="ty">DbCredentials</span>.<span class="kw">class</span>);
+        }
+        <span class="kw">return</span> cachedCredentials;
+    }
+
+    <span class="an">@Bean</span>
+    <span class="an">@Primary</span>
+    <span class="kw">public</span> <span class="ty">DataSource</span> <span class="nm">primaryDataSource</span>() {
+        <span class="ty">DbCredentials</span> creds = getCredentials();
+        <span class="ty">HikariConfig</span> config = <span class="kw">new</span> <span class="ty">HikariConfig</span>();
+        config.setJdbcUrl(<span class="st">"jdbc:mysql://"</span> + creds.getHost() + <span class="st">":3306/"</span> + creds.getDbname());
+        config.setUsername(creds.getUsername());
+        config.setPassword(creds.getPassword());
+        config.setMaximumPoolSize(<span class="nu">10</span>);          <span class="cm">// HikariCP connection pool</span>
+        config.setMinimumIdle(<span class="nu">2</span>);
+        config.setConnectionTimeout(<span class="nu">30000</span>);
+        config.setIdleTimeout(<span class="nu">600000</span>);
+        <span class="kw">return new</span> <span class="ty">HikariDataSource</span>(config);
+    }
+
+    <span class="cm">// Read Replica DataSource for analytics queries</span>
+    <span class="an">@Bean</span>
+    <span class="kw">public</span> <span class="ty">DataSource</span> <span class="nm">readReplicaDataSource</span>() {
+        <span class="ty">DbCredentials</span> creds = getCredentials();
+        <span class="ty">HikariConfig</span> config = <span class="kw">new</span> <span class="ty">HikariConfig</span>();
+        <span class="cm">// Read replica has a different endpoint!</span>
+        config.setJdbcUrl(<span class="st">"jdbc:mysql://"</span> + creds.getReplicaHost() + <span class="st">":3306/"</span> + creds.getDbname());
+        config.setUsername(creds.getUsername());
+        config.setPassword(creds.getPassword());
+        config.setMaximumPoolSize(<span class="nu">5</span>);
+        config.setReadOnly(<span class="kw">true</span>);
+        <span class="kw">return new</span> <span class="ty">HikariDataSource</span>(config);
+    }
+}</code></pre>
+
+            <h3>☕ Repository with Read/Write Routing</h3>
+            <pre><code><span class="an">@Repository</span>
+<span class="kw">public interface</span> <span class="ty">OrderJpaRepository</span> <span class="kw">extends</span> <span class="ty">JpaRepository</span>&lt;<span class="ty">OrderEntity</span>, <span class="ty">String</span>&gt; {
+
+    <span class="cm">// Uses primary (write) datasource</span>
+    <span class="ty">Optional</span>&lt;<span class="ty">OrderEntity</span>&gt; <span class="nm">findById</span>(<span class="ty">String</span> id);
+
+    <span class="cm">// Analytics query — route to read replica via @Transactional(readOnly=true)</span>
+    <span class="an">@Query</span>(<span class="st">"SELECT o FROM OrderEntity o WHERE o.status = :status"</span>)
+    <span class="ty">List</span>&lt;<span class="ty">OrderEntity</span>&gt; <span class="nm">findByStatus</span>(<span class="an">@Param</span>(<span class="st">"status"</span>) <span class="ty">String</span> status);
+}
+
+<span class="an">@Service</span>
+<span class="kw">public class</span> <span class="ty">OrderAnalyticsService</span> {
+
+    <span class="kw">private final</span> <span class="ty">OrderJpaRepository</span> repository;
+
+    <span class="cm">// @Transactional(readOnly=true) routes to read replica</span>
+    <span class="an">@Transactional</span>(readOnly = <span class="kw">true</span>)
+    <span class="kw">public</span> <span class="ty">List</span>&lt;<span class="ty">OrderEntity</span>&gt; <span class="nm">getOrdersByStatus</span>(<span class="ty">String</span> status) {
+        <span class="kw">return</span> repository.findByStatus(status);
+    }
+}</code></pre>
+
+            <div class="tip red"><strong>Read Replica ≠ Multi-AZ.</strong> Read Replica = async replication for read scaling. Multi-AZ = sync replication for disaster recovery. Different endpoints, different purposes.</div>
+            <div class="exam-box">
+                <h4>🎓 Exam Insights</h4>
+                <ul>
+                    <li>RDS 1040 "Too Many Connections" → use RDS Proxy (connection pooling at AWS level)</li>
+                    <li>Read Replicas: async, different endpoint, use for SELECT only</li>
+                    <li>Multi-AZ: sync, same DNS endpoint, automatic failover, NOT for read scaling</li>
+                    <li>Encrypt unencrypted RDS: snapshot → copy with encryption → restore → migrate</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== LAB 9 ===== -->
+    <div class="lab" id="jlab9">
+        <div class="lab-header" onclick="toggle(this)">
+            <span class="lab-num">Lab 9</span>
+            <span class="lab-title">ElastiCache Redis — Spring Cache Abstraction & Session Store</span>
+            <div style="display:flex;gap:6px"><span class="tag spring">Spring Cache</span><span class="tag blue">Redis</span><span class="tag java">Lettuce</span></div>
+            <span class="chevron">▼</span>
+        </div>
+        <div class="lab-body">
+            <p>Use Spring's <code>@Cacheable</code> abstraction with ElastiCache Redis for lazy loading, and Spring Session for distributed session management.</p>
+
+            <h3>📦 Dependencies</h3>
+            <pre><code>&lt;dependency&gt;
+  &lt;groupId&gt;org.springframework.boot&lt;/groupId&gt;
+  &lt;artifactId&gt;spring-boot-starter-data-redis&lt;/artifactId&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+  &lt;groupId&gt;org.springframework.session&lt;/groupId&gt;
+  &lt;artifactId&gt;spring-session-data-redis&lt;/artifactId&gt;
+&lt;/dependency&gt;</code></pre>
+
+            <h3>⚙️ application.properties</h3>
+            <pre><code>spring.data.redis.host=${REDIS_HOST:localhost}
+spring.data.redis.port=6379
+spring.data.redis.timeout=2000ms
+# ElastiCache Redis endpoint (no auth by default in VPC)
+# spring.data.redis.host=my-redis.abc123.ng.0001.use1.cache.amazonaws.com</code></pre>
+
+            <h3>☕ Lazy Loading with @Cacheable (Spring Cache)</h3>
+            <pre><code><span class="an">@Service</span>
+<span class="kw">public class</span> <span class="ty">ProductService</span> {
+
+    <span class="kw">private final</span> <span class="ty">ProductRepository</span> productRepository;
+
+    <span class="cm">/**
+     * Lazy Loading pattern via Spring @Cacheable:
+     * 1. Check Redis cache for key "products::productId"
+     * 2. Cache HIT → return cached value (fast, no DB call)
+     * 3. Cache MISS → call DB, store result in Redis with TTL, return
+     */</span>
+    <span class="an">@Cacheable</span>(value = <span class="st">"products"</span>, key = <span class="st">"#productId"</span>)
+    <span class="kw">public</span> <span class="ty">Product</span> <span class="nm">getProduct</span>(<span class="ty">String</span> productId) {
+        <span class="cm">// Only called on cache MISS</span>
+        <span class="kw">return</span> productRepository.findById(productId)
+            .orElseThrow(() -> <span class="kw">new</span> <span class="ty">ProductNotFoundException</span>(productId));
+    }
+
+    <span class="cm">/**
+     * Write-Through pattern: update DB AND evict/update cache
+     */</span>
+    <span class="an">@CachePut</span>(value = <span class="st">"products"</span>, key = <span class="st">"#product.id"</span>)
+    <span class="kw">public</span> <span class="ty">Product</span> <span class="nm">updateProduct</span>(<span class="ty">Product</span> product) {
+        <span class="kw">return</span> productRepository.save(product); <span class="cm">// also updates cache</span>
+    }
+
+    <span class="cm">// Evict from cache when deleted</span>
+    <span class="an">@CacheEvict</span>(value = <span class="st">"products"</span>, key = <span class="st">"#productId"</span>)
+    <span class="kw">public void</span> <span class="nm">deleteProduct</span>(<span class="ty">String</span> productId) {
+        productRepository.deleteById(productId);
+    }
+}
+
+<span class="cm">// Configure TTL per cache</span>
+<span class="an">@Configuration</span>
+<span class="an">@EnableCaching</span>
+<span class="kw">public class</span> <span class="ty">CacheConfig</span> {
+
+    <span class="an">@Bean</span>
+    <span class="kw">public</span> <span class="ty">RedisCacheConfiguration</span> <span class="nm">cacheConfiguration</span>() {
+        <span class="kw">return</span> <span class="ty">RedisCacheConfiguration</span>.defaultCacheConfig()
+            .entryTtl(<span class="ty">Duration</span>.ofMinutes(<span class="nu">5</span>))   <span class="cm">// 5-minute TTL</span>
+            .disableCachingNullValues()
+            .serializeValuesWith(<span class="ty">RedisSerializationContext</span>.SerializationPair
+                .fromSerializer(<span class="kw">new</span> <span class="ty">GenericJackson2JsonRedisSerializer</span>()));
+    }
+}</code></pre>
+
+            <h3>☕ Distributed Session Store (Spring Session + Redis)</h3>
+            <pre><code><span class="cm">// Just add @EnableRedisHttpSession — Spring handles the rest</span>
+<span class="an">@Configuration</span>
+<span class="an">@EnableRedisHttpSession</span>(maxInactiveIntervalInSeconds = <span class="nu">3600</span>)
+<span class="kw">public class</span> <span class="ty">SessionConfig</span> { }
+
+<span class="cm">// In your controller — session is stored in Redis automatically</span>
+<span class="an">@PostMapping</span>(<span class="st">"/login"</span>)
+<span class="kw">public</span> <span class="ty">ResponseEntity</span>&lt;<span class="ty">String</span>&gt; <span class="nm">login</span>(<span class="an">@RequestBody</span> <span class="ty">LoginRequest</span> req,
+                                       <span class="ty">HttpSession</span> session) {
+    <span class="ty">User</span> user = authService.authenticate(req);
+    session.setAttribute(<span class="st">"userId"</span>, user.getId());  <span class="cm">// stored in Redis</span>
+    <span class="kw">return</span> <span class="ty">ResponseEntity</span>.ok(<span class="st">"Logged in"</span>);
+    <span class="cm">// Any app instance can read this session from Redis → stateless app</span>
+}</code></pre>
+
+            <div class="exam-box">
+                <h4>🎓 Exam Insights</h4>
+                <ul>
+                    <li>Redis = persistent (survives reboot), Multi-AZ, pub/sub, read replicas</li>
+                    <li>Memcached = NOT persistent, multi-thread, no HA — rarely the right answer</li>
+                    <li>Lazy loading: 3 round trips on cache miss; stale data possible</li>
+                    <li>Write-through: always fresh data; cache churn for rarely-read data</li>
+                    <li>TTL eviction: LRU when memory full; set TTL to avoid stale data</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== LAB 10 ===== -->
+    <div class="lab" id="jlab10">
+        <div class="lab-header" onclick="toggle(this)">
+            <span class="lab-num">Lab 10</span>
+            <span class="lab-title">SQS — Java Producer & Consumer with Spring Cloud AWS</span>
+            <div style="display:flex;gap:6px"><span class="tag spring">Spring Cloud AWS</span><span class="tag teal">SQS</span></div>
+            <span class="chevron">▼</span>
+        </div>
+        <div class="lab-body">
+            <h3>📦 Spring Cloud AWS SQS Dependency</h3>
+            <pre><code>&lt;dependency&gt;
+  &lt;groupId&gt;io.awspring.cloud&lt;/groupId&gt;
+  &lt;artifactId&gt;spring-cloud-aws-starter-sqs&lt;/artifactId&gt;
+  &lt;version&gt;3.1.0&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+
+            <h3>☕ SQS Producer</h3>
+            <pre><code><span class="an">@Service</span>
+<span class="kw">public class</span> <span class="ty">OrderEventPublisher</span> {
+
+    <span class="kw">private final</span> <span class="ty">SqsTemplate</span> sqsTemplate;
+
+    <span class="kw">public</span> <span class="ty">OrderEventPublisher</span>(<span class="ty">SqsTemplate</span> sqsTemplate) {
+        <span class="kw">this</span>.sqsTemplate = sqsTemplate;
+    }
+
+    <span class="kw">public void</span> <span class="nm">publishOrder</span>(<span class="ty">OrderEvent</span> event) {
+        sqsTemplate.send(<span class="st">"orders-queue"</span>, event);
+        <span class="cm">// Spring Cloud AWS handles serialization to JSON automatically</span>
+    }
+
+    <span class="cm">// FIFO queue with MessageGroupId</span>
+    <span class="kw">public void</span> <span class="nm">publishOrderFifo</span>(<span class="ty">OrderEvent</span> event) {
+        sqsTemplate.send(to -> to
+            .queue(<span class="st">"orders-queue.fifo"</span>)
+            .payload(event)
+            .messageGroupId(<span class="st">"customer-"</span> + event.getCustomerId())
+            .messageDeduplicationId(event.getOrderId()));
+    }
+
+    <span class="cm">// Raw SDK approach with delay</span>
+    <span class="kw">public void</span> <span class="nm">publishWithDelay</span>(<span class="ty">String</span> queueUrl, <span class="ty">String</span> body, <span class="kw">int</span> delaySeconds) {
+        <span class="ty">SqsClient</span> sqsClient = <span class="ty">SqsClient</span>.create();
+        sqsClient.sendMessage(r -> r
+            .queueUrl(queueUrl)
+            .messageBody(body)
+            .delaySeconds(delaySeconds));  <span class="cm">// up to 900 seconds (15 min)</span>
+    }
+}</code></pre>
+
+            <h3>☕ SQS Consumer with @SqsListener</h3>
+            <pre><code><span class="an">@Component</span>
+<span class="kw">public class</span> <span class="ty">OrderEventConsumer</span> {
+
+    <span class="kw">private final</span> <span class="ty">OrderService</span> orderService;
+
+    <span class="cm">/**
+     * @SqsListener handles:
+     * - Long polling automatically
+     * - Message deletion on success
+     * - Visibility timeout management
+     * - Deserialization from JSON
+     */</span>
+    <span class="an">@SqsListener</span>(<span class="st">"orders-queue"</span>)
+    <span class="kw">public void</span> <span class="nm">processOrder</span>(<span class="ty">OrderEvent</span> event,
+                               <span class="an">@Header</span>(<span class="st">"MessageId"</span>) <span class="ty">String</span> messageId) {
+        <span class="kw">try</span> {
+            orderService.process(event);
+            <span class="cm">// Message auto-deleted from queue on method return without exception</span>
+        } <span class="kw">catch</span> (<span class="ty">Exception</span> e) {
+            <span class="cm">// Throw exception → message returns to queue → eventually goes to DLQ</span>
+            <span class="kw">throw new</span> <span class="ty">RuntimeException</span>(<span class="st">"Failed to process order: "</span> + messageId, e);
+        }
+    }
+
+    <span class="cm">// Batch processing</span>
+    <span class="an">@SqsListener</span>(value = <span class="st">"orders-queue"</span>, maxNumberOfMessages = <span class="st">"10"</span>)
+    <span class="kw">public void</span> <span class="nm">processBatch</span>(<span class="ty">List</span>&lt;<span class="ty">Message</span>&lt;<span class="ty">OrderEvent</span>&gt;&gt; messages) {
+        messages.forEach(msg -> orderService.process(msg.getPayload()));
+    }
+}</code></pre>
+
+            <div class="exam-box">
+                <h4>🎓 Exam Insights</h4>
+                <ul>
+                    <li>Standard queue: at-least-once delivery, best-effort ordering, unlimited throughput</li>
+                    <li>FIFO queue: exactly-once, strict ordering, 300 msg/s (3000 with batching)</li>
+                    <li>Visibility timeout: 0s–12h, default 30s. Set to 6× Lambda timeout</li>
+                    <li>Long polling: WaitTimeSeconds 1–20s. Reduces empty receives and cost</li>
+                    <li>Extended Client: messages &gt;256KB → store payload in S3, pointer in SQS</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== LAB 11 ===== -->
+    <div class="lab" id="jlab11">
+        <div class="lab-header" onclick="toggle(this)">
+            <span class="lab-num">Lab 11</span>
+            <span class="lab-title">SNS — Java Publisher & Fan-Out Pattern</span>
+            <div style="display:flex;gap:6px"><span class="tag java">Java</span><span class="tag orange">SNS</span><span class="tag teal">SQS</span></div>
+            <span class="chevron">▼</span>
+        </div>
+        <div class="lab-body">
+            <h3>☕ SNS Publisher Service</h3>
+            <pre><code><span class="an">@Service</span>
+<span class="kw">public class</span> <span class="ty">EventPublisher</span> {
+
+    <span class="kw">private final</span> <span class="ty">SnsClient</span> snsClient;
+    <span class="kw">private final</span> <span class="ty">ObjectMapper</span> objectMapper;
+
+    <span class="an">@Value</span>(<span class="st">"${aws.sns.order-events-topic-arn}"</span>)
+    <span class="kw">private</span> <span class="ty">String</span> topicArn;
+
+    <span class="kw">public</span> <span class="ty">EventPublisher</span>(<span class="ty">SnsClient</span> snsClient, <span class="ty">ObjectMapper</span> objectMapper) {
+        <span class="kw">this</span>.snsClient = snsClient;
+        <span class="kw">this</span>.objectMapper = objectMapper;
+    }
+
+    <span class="kw">public</span> <span class="ty">String</span> <span class="nm">publishOrderEvent</span>(<span class="ty">OrderEvent</span> event) <span class="kw">throws</span> <span class="ty">JsonProcessingException</span> {
+        <span class="ty">String</span> message = objectMapper.writeValueAsString(event);
+
+        <span class="cm">// Add message attributes for SNS filter policies</span>
+        <span class="ty">Map</span>&lt;<span class="ty">String</span>, <span class="ty">MessageAttributeValue</span>&gt; attributes = <span class="ty">Map</span>.of(
+            <span class="st">"eventType"</span>, <span class="ty">MessageAttributeValue</span>.builder()
+                .dataType(<span class="st">"String"</span>)
+                .stringValue(event.getEventType())  <span class="cm">// e.g., "ORDER_PLACED"</span>
+                .build(),
+            <span class="st">"region"</span>, <span class="ty">MessageAttributeValue</span>.builder()
+                .dataType(<span class="st">"String"</span>)
+                .stringValue(event.getRegion())
+                .build()
+        );
+
+        <span class="ty">PublishResponse</span> response = snsClient.publish(r -> r
+            .topicArn(topicArn)
+            .message(message)
+            .subject(<span class="st">"Order Event: "</span> + event.getEventType())
+            .messageAttributes(attributes));
+
+        <span class="kw">return</span> response.messageId();
+        <span class="cm">// All SQS subscribers receive this message simultaneously (fan-out)</span>
+    }
+
+    <span class="cm">// Mobile push notification</span>
+    <span class="kw">public void</span> <span class="nm">sendPushNotification</span>(<span class="ty">String</span> endpointArn, <span class="ty">String</span> message) {
+        snsClient.publish(r -> r
+            .targetArn(endpointArn)  <span class="cm">// device endpoint, not topic</span>
+            .message(message)
+            .messageStructure(<span class="st">"json"</span>));
+    }
+}</code></pre>
+
+            <div class="exam-box">
+                <h4>🎓 Exam Insights</h4>
+                <ul>
+                    <li>SNS fan-out → multiple SQS queues = most common exam pattern</li>
+                    <li>SNS does NOT persist messages — SQS provides the buffer</li>
+                    <li>Filter policies route specific messages to specific subscribers</li>
+                    <li>10M subscriptions per topic, 100K topics limit</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== LAB 12 ===== -->
+    <div class="lab" id="jlab12">
+        <div class="lab-header" onclick="toggle(this)">
+            <span class="lab-num">Lab 12</span>
+            <span class="lab-title">Kinesis — Java Producer with KPL & Consumer with KCL</span>
+            <div style="display:flex;gap:6px"><span class="tag java">Java</span><span class="tag blue">Kinesis</span><span class="tag orange">KPL/KCL</span></div>
+            <span class="chevron">▼</span>
+        </div>
+        <div class="lab-body">
+            <h3>☕ Kinesis Producer (SDK v2)</h3>
+            <pre><code><span class="an">@Service</span>
+<span class="kw">public class</span> <span class="ty">ClickstreamProducer</span> {
+
+    <span class="kw">private final</span> <span class="ty">KinesisClient</span> kinesisClient;
+    <span class="kw">private final</span> <span class="ty">ObjectMapper</span> objectMapper;
+
+    <span class="kw">public void</span> <span class="nm">publishEvent</span>(<span class="ty">ClickEvent</span> event) <span class="kw">throws</span> <span class="ty">Exception</span> {
+        <span class="ty">String</span> json = objectMapper.writeValueAsString(event);
+
+        <span class="cm">// IMPORTANT: Use diverse partition keys to avoid hot shards!</span>
+        <span class="cm">// BAD:  partitionKey = "fixed-key"  → all records to one shard</span>
+        <span class="cm">// GOOD: partitionKey = userId       → distributed across shards</span>
+        <span class="ty">PutRecordRequest</span> request = <span class="ty">PutRecordRequest</span>.builder()
+            .streamName(<span class="st">"clickstream"</span>)
+            .data(<span class="ty">SdkBytes</span>.fromUtf8String(json))
+            .partitionKey(event.getUserId())  <span class="cm">// diverse key = even distribution</span>
+            .build();
+
+        kinesisClient.putRecord(request);
+    }
+
+    <span class="cm">// Batch put for higher throughput</span>
+    <span class="kw">public void</span> <span class="nm">publishBatch</span>(<span class="ty">List</span>&lt;<span class="ty">ClickEvent</span>&gt; events) <span class="kw">throws</span> <span class="ty">Exception</span> {
+        <span class="ty">List</span>&lt;<span class="ty">PutRecordsRequestEntry</span>&gt; entries = events.stream()
+            .map(e -> {
+                <span class="kw">try</span> {
+                    <span class="kw">return</span> <span class="ty">PutRecordsRequestEntry</span>.builder()
+                        .data(<span class="ty">SdkBytes</span>.fromUtf8String(objectMapper.writeValueAsString(e)))
+                        .partitionKey(e.getUserId())
+                        .build();
+                } <span class="kw">catch</span> (<span class="ty">Exception</span> ex) { <span class="kw">throw new</span> <span class="ty">RuntimeException</span>(ex); }
+            })
+            .collect(<span class="ty">Collectors</span>.toList());
+
+        <span class="ty">PutRecordsResponse</span> response = kinesisClient.putRecords(r -> r
+            .streamName(<span class="st">"clickstream"</span>)
+            .records(entries));
+
+        <span class="cm">// Handle partial failures</span>
+        <span class="kw">if</span> (response.failedRecordCount() > <span class="nu">0</span>) {
+            <span class="cm">// Retry failed records with exponential backoff</span>
+            retryFailedRecords(response, entries);
+        }
+    }
+}</code></pre>
+
+            <div class="exam-box">
+                <h4>🎓 Exam Insights</h4>
+                <ul>
+                    <li>Write: 1MB/s or 1000 records/s per shard. Read: 2MB/s per shard</li>
+                    <li>Hot shard = bad partition key → use userId, sessionId, not fixed strings</li>
+                    <li>KCL: one KCL instance per shard maximum; checkpoints in DynamoDB</li>
+                    <li>ProvisionedThroughputExceededException → exponential backoff + add shards</li>
+                    <li>Firehose: near real-time (60s), no replay, to S3/Redshift/ES</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== LAB 13 ===== -->
+    <div class="lab" id="jlab13">
+        <div class="lab-header" onclick="toggle(this)">
+            <span class="lab-num">Lab 13</span>
+            <span class="lab-title">S3 — Java SDK Operations, Multipart Upload & Pre-signed URLs</span>
+            <div style="display:flex;gap:6px"><span class="tag java">Java</span><span class="tag teal">S3</span><span class="tag spring">Spring Boot</span></div>
+            <span class="chevron">▼</span>
+        </div>
+        <div class="lab-body">
+            <h3>☕ S3 Service — Full Operations</h3>
+            <pre><code><span class="an">@Service</span>
+<span class="kw">public class</span> <span class="ty">S3StorageService</span> {
+
+    <span class="kw">private final</span> <span class="ty">S3Client</span> s3Client;
+    <span class="kw">private final</span> <span class="ty">S3Presigner</span> presigner;
+
+    <span class="an">@Value</span>(<span class="st">"${aws.s3.bucket}"</span>)
+    <span class="kw">private</span> <span class="ty">String</span> bucketName;
+
+    <span class="kw">public</span> <span class="ty">S3StorageService</span>(<span class="ty">S3Client</span> s3Client) {
+        <span class="kw">this</span>.s3Client = s3Client;
+        <span class="kw">this</span>.presigner = <span class="ty">S3Presigner</span>.create();
+    }
+
+    <span class="cm">// Upload with SSE-KMS encryption</span>
+    <span class="kw">public void</span> <span class="nm">uploadEncrypted</span>(<span class="ty">String</span> key, <span class="ty">byte</span>[] data) {
+        s3Client.putObject(r -> r
+            .bucket(bucketName)
+            .key(key)
+            .serverSideEncryption(<span class="ty">ServerSideEncryption</span>.AWS_KMS)
+            .ssekmsKeyId(<span class="st">"alias/my-key"</span>),
+            <span class="ty">RequestBody</span>.fromBytes(data));
+    }
+
+    <span class="cm">// Multipart upload for files > 100MB</span>
+    <span class="kw">public void</span> <span class="nm">multipartUpload</span>(<span class="ty">String</span> key, <span class="ty">Path</span> filePath) <span class="kw">throws</span> <span class="ty">IOException</span> {
+        <span class="ty">CreateMultipartUploadResponse</span> init = s3Client.createMultipartUpload(r -> r
+            .bucket(bucketName).key(key));
+        <span class="ty">String</span> uploadId = init.uploadId();
+
+        <span class="ty">List</span>&lt;<span class="ty">CompletedPart</span>&gt; parts = <span class="kw">new</span> <span class="ty">ArrayList</span>&lt;&gt;();
+        <span class="kw">byte</span>[] fileBytes = <span class="ty">Files</span>.readAllBytes(filePath);
+        <span class="kw">int</span> partSize = <span class="nu">5</span> * <span class="nu">1024</span> * <span class="nu">1024</span>; <span class="cm">// 5MB minimum part size</span>
+        <span class="kw">int</span> partNumber = <span class="nu">1</span>;
+
+        <span class="kw">for</span> (<span class="kw">int</span> offset = <span class="nu">0</span>; offset < fileBytes.length; offset += partSize) {
+            <span class="kw">int</span> length = <span class="ty">Math</span>.min(partSize, fileBytes.length - offset);
+            <span class="kw">byte</span>[] partData = <span class="ty">Arrays</span>.copyOfRange(fileBytes, offset, offset + length);
+            <span class="kw">final int</span> pn = partNumber++;
+
+            <span class="ty">UploadPartResponse</span> partResponse = s3Client.uploadPart(r -> r
+                .bucket(bucketName).key(key)
+                .uploadId(uploadId).partNumber(pn),
+                <span class="ty">RequestBody</span>.fromBytes(partData));
+
+            parts.add(<span class="ty">CompletedPart</span>.builder()
+                .partNumber(pn).eTag(partResponse.eTag()).build());
+        }
+
+        s3Client.completeMultipartUpload(r -> r
+            .bucket(bucketName).key(key).uploadId(uploadId)
+            .multipartUpload(m -> m.parts(parts)));
+    }
+
+    <span class="cm">// Generate pre-signed URL (valid for 1 hour)</span>
+    <span class="kw">public</span> <span class="ty">URL</span> <span class="nm">generatePresignedUrl</span>(<span class="ty">String</span> key, <span class="kw">int</span> expiryMinutes) {
+        <span class="ty">GetObjectPresignRequest</span> presignRequest = <span class="ty">GetObjectPresignRequest</span>.builder()
+            .signatureDuration(<span class="ty">Duration</span>.ofMinutes(expiryMinutes))
+            .getObjectRequest(r -> r.bucket(bucketName).key(key))
+            .build();
+
+        <span class="kw">return</span> presigner.presignGetObject(presignRequest).url();
+        <span class="cm">// Anyone with this URL can download the object for expiryMinutes</span>
+    }
+
+    <span class="cm">// S3 Object Lambda — transform on read (e.g., redact PII)</span>
+    <span class="kw">public</span> <span class="ty">String</span> <span class="nm">getObjectViaLambda</span>(<span class="ty">String</span> objectLambdaArn, <span class="ty">String</span> key) {
+        <span class="ty">S3Client</span> s3ObjectLambda = <span class="ty">S3Client</span>.builder()
+            .endpointOverride(<span class="ty">URI</span>.create(objectLambdaArn))
+            .build();
+        <span class="ty">ResponseBytes</span>&lt;<span class="ty">GetObjectResponse</span>&gt; obj = s3ObjectLambda.getObjectAsBytes(r -> r
+            .bucket(bucketName).key(key));
+        <span class="kw">return</span> obj.asUtf8String(); <span class="cm">// transformed by Lambda on the fly</span>
+    }
+}</code></pre>
+
+            <div class="exam-box">
+                <h4>🎓 Exam Insights</h4>
+                <ul>
+                    <li>Multipart upload required for files &gt;5GB; recommended for &gt;100MB</li>
+                    <li>SSE-S3 header: <code>AES256</code>; SSE-KMS header: <code>aws:kms</code></li>
+                    <li>Pre-signed URLs: time-limited, no AWS credentials needed by recipient</li>
+                    <li>S3 Object Lambda: transform data on-the-fly (redact PII, convert format)</li>
+                    <li>Transfer Acceleration: uses CloudFront edge locations; bucket name must be DNS-compliant (no dots)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== LAB 14 ===== -->
+    <div class="lab" id="jlab14">
+        <div class="lab-header" onclick="toggle(this)">
+            <span class="lab-num">Lab 14</span>
+            <span class="lab-title">X-Ray — Distributed Tracing in Spring Boot</span>
+            <div style="display:flex;gap:6px"><span class="tag spring">Spring Boot</span><span class="tag purple">X-Ray</span><span class="tag java">Java</span></div>
+            <span class="chevron">▼</span>
+        </div>
+        <div class="lab-body">
+            <h3>📦 Dependencies</h3>
+            <pre><code>&lt;dependency&gt;
+  &lt;groupId&gt;com.amazonaws&lt;/groupId&gt;
+  &lt;artifactId&gt;aws-xray-recorder-sdk-core&lt;/artifactId&gt;
+  &lt;version&gt;2.15.0&lt;/version&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+  &lt;groupId&gt;com.amazonaws&lt;/groupId&gt;
+  &lt;artifactId&gt;aws-xray-recorder-sdk-spring&lt;/artifactId&gt;
+  &lt;version&gt;2.15.0&lt;/version&gt;
+&lt;/dependency&gt;
+&lt;dependency&gt;
+  &lt;groupId&gt;com.amazonaws&lt;/groupId&gt;
+  &lt;artifactId&gt;aws-xray-recorder-sdk-aws-sdk-v2-instrumentor&lt;/artifactId&gt;
+  &lt;version&gt;2.15.0&lt;/version&gt;
+&lt;/dependency&gt;</code></pre>
+
+            <h3>☕ X-Ray Configuration</h3>
+            <pre><code><span class="an">@Configuration</span>
+<span class="kw">public class</span> <span class="ty">XRayConfig</span> {
+
+    <span class="kw">static</span> {
+        <span class="cm">// Auto-instrument all AWS SDK v2 calls (DynamoDB, S3, SQS, etc.)</span>
+        <span class="ty">TracingInterceptor</span> interceptor = <span class="kw">new</span> <span class="ty">TracingInterceptor</span>();
+        <span class="ty">AwsSdkTelemetry</span>.create(<span class="ty">GlobalTracer</span>.get());
+    }
+
+    <span class="an">@Bean</span>
+    <span class="kw">public</span> <span class="ty">Filter</span> <span class="nm">xrayFilter</span>() {
+        <span class="cm">// Intercept all HTTP requests and create X-Ray segments</span>
+        <span class="kw">return new</span> <span class="ty">AWSXRayServletFilter</span>(<span class="st">"my-spring-app"</span>);
+    }
+}
+
+<span class="an">@Service</span>
+<span class="kw">public class</span> <span class="ty">OrderService</span> {
+
+    <span class="kw">public</span> <span class="ty">Order</span> <span class="nm">processOrder</span>(<span class="ty">OrderRequest</span> request) {
+        <span class="cm">// Create custom subsegment for detailed tracing</span>
+        <span class="ty">Subsegment</span> subsegment = <span class="ty">AWSXRay</span>.beginSubsegment(<span class="st">"process-order"</span>);
+        <span class="kw">try</span> {
+            <span class="cm">// Add annotations — INDEXED, searchable in X-Ray console</span>
+            subsegment.putAnnotation(<span class="st">"orderId"</span>, request.getOrderId());
+            subsegment.putAnnotation(<span class="st">"customerId"</span>, request.getCustomerId());
+
+            <span class="cm">// Add metadata — NOT indexed, for debugging only</span>
+            subsegment.putMetadata(<span class="st">"rawRequest"</span>, request);
+
+            <span class="ty">Order</span> order = validateAndSave(request);
+            <span class="kw">return</span> order;
+
+        } <span class="kw">catch</span> (<span class="ty">Exception</span> e) {
+            subsegment.addException(e);
+            <span class="kw">throw</span> e;
+        } <span class="kw">finally</span> {
+            <span class="ty">AWSXRay</span>.endSubsegment();
+        }
+    }
+}</code></pre>
+
+            <div class="exam-box">
+                <h4>🎓 Exam Insights</h4>
+                <ul>
+                    <li>Annotations = indexed key/value (up to 50) — use for filtering traces</li>
+                    <li>Metadata = not indexed — store any debug data (objects, lists)</li>
+                    <li>EC2: must run X-Ray daemon + IAM role with <code>xray:PutTraceSegments</code></li>
+                    <li>Lambda: enable Active tracing in config + import SDK</li>
+                    <li>Beanstalk: <code>xray-daemon.config</code> in <code>.ebextensions/</code></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== LAB 15 ===== -->
+    <div class="lab" id="jlab15">
+        <div class="lab-header" onclick="toggle(this)">
+            <span class="lab-num">Lab 15</span>
+            <span class="lab-title">CloudWatch — Custom Metrics & Alarms from Java</span>
+            <div style="display:flex;gap:6px"><span class="tag java">Java</span><span class="tag orange">CloudWatch</span></div>
+            <span class="chevron">▼</span>
+        </div>
+        <div class="lab-body">
+            <h3>☕ Push Custom Metrics to CloudWatch</h3>
+            <pre><code><span class="an">@Service</span>
+<span class="kw">public class</span> <span class="ty">MetricsService</span> {
+
+    <span class="kw">private final</span> <span class="ty">CloudWatchClient</span> cloudWatch;
+
+    <span class="kw">public void</span> <span class="nm">recordOrderProcessingTime</span>(<span class="ty">String</span> instanceId, <span class="kw">double</span> durationMs) {
+        <span class="ty">MetricDatum</span> datum = <span class="ty">MetricDatum</span>.builder()
+            .metricName(<span class="st">"OrderProcessingTime"</span>)
+            .value(durationMs)
+            .unit(<span class="ty">StandardUnit</span>.MILLISECONDS)
+            .timestamp(<span class="ty">Instant</span>.now())
+            .dimensions(
+                <span class="ty">Dimension</span>.builder().name(<span class="st">"InstanceId"</span>).value(instanceId).build(),
+                <span class="ty">Dimension</span>.builder().name(<span class="st">"Environment"</span>).value(<span class="st">"prod"</span>).build()
+            )
+            .build();
+
+        cloudWatch.putMetricData(r -> r
+            .namespace(<span class="st">"MyApp/Orders"</span>)
+            .metricData(datum));
+    }
+
+    <span class="cm">// Spring AOP — auto-record method execution time</span>
+    <span class="an">@Around</span>(<span class="st">"@annotation(Monitored)"</span>)
+    <span class="kw">public</span> <span class="ty">Object</span> <span class="nm">recordMetric</span>(<span class="ty">ProceedingJoinPoint</span> pjp) <span class="kw">throws</span> <span class="ty">Throwable</span> {
+        <span class="kw">long</span> start = <span class="ty">System</span>.currentTimeMillis();
+        <span class="kw">try</span> {
+            <span class="kw">return</span> pjp.proceed();
+        } <span class="kw">finally</span> {
+            <span class="kw">double</span> duration = <span class="ty">System</span>.currentTimeMillis() - start;
+            recordOrderProcessingTime(<span class="st">"app-instance"</span>, duration);
+        }
+    }
+}</code></pre>
+
+            <div class="exam-box">
+                <h4>🎓 Exam Insights</h4>
+                <ul>
+                    <li>EC2 default metrics: CPU, Network, Disk I/O — every 5 min</li>
+                    <li>Memory, swap = NOT default — must install CloudWatch Agent or push via SDK</li>
+                    <li>Custom metrics: use <code>PutMetricData</code> API</li>
+                    <li>High-resolution: up to 1 second (StorageResolution parameter)</li>
+                    <li>Alarm states: OK, ALARM, INSUFFICIENT_DATA</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== LAB 16 ===== -->
+    <div class="lab" id="jlab16">
+        <div class="lab-header" onclick="toggle(this)">
+            <span class="lab-num">Lab 16</span>
+            <span class="lab-title">KMS + Secrets Manager — Java Encryption & Secret Retrieval</span>
+            <div style="display:flex;gap:6px"><span class="tag red">KMS</span><span class="tag java">Java</span><span class="tag spring">Spring Boot</span></div>
+            <span class="chevron">▼</span>
+        </div>
+        <div class="lab-body">
+            <h3>☕ KMS Envelope Encryption in Java</h3>
+            <pre><code><span class="an">@Service</span>
+<span class="kw">public class</span> <span class="ty">EncryptionService</span> {
+
+    <span class="kw">private final</span> <span class="ty">KmsClient</span> kmsClient;
+    <span class="kw">private final</span> <span class="ty">String</span> keyId = <span class="st">"alias/my-app-key"</span>;
+
+    <span class="cm">/**
+     * Envelope Encryption:
+     * 1. Ask KMS to generate a data key (plaintext + encrypted versions)
+     * 2. Encrypt data locally with plaintext data key (fast, no KMS call)
+     * 3. Store encrypted data + encrypted data key (NEVER store plaintext key)
+     * 4. To decrypt: call KMS to decrypt the data key, then decrypt data locally
+     */</span>
+    <span class="kw">public</span> <span class="ty">EncryptedPayload</span> <span class="nm">encrypt</span>(<span class="ty">String</span> plaintext) <span class="kw">throws</span> <span class="ty">Exception</span> {
+        <span class="cm">// Step 1: Generate data key from KMS</span>
+        <span class="ty">GenerateDataKeyResponse</span> dataKey = kmsClient.generateDataKey(r -> r
+            .keyId(keyId)
+            .keySpec(<span class="ty">DataKeySpec</span>.AES_256));
+
+        <span class="kw">byte</span>[] plaintextKey = dataKey.plaintext().asByteArray();
+        <span class="kw">byte</span>[] encryptedKey = dataKey.ciphertextBlob().asByteArray();
+
+        <span class="cm">// Step 2: Encrypt data locally with AES-256</span>
+        <span class="kw">byte</span>[] encryptedData = aesEncrypt(plaintext.getBytes(), plaintextKey);
+
+        <span class="cm">// Step 3: Clear plaintext key from memory immediately!</span>
+        <span class="ty">Arrays</span>.fill(plaintextKey, (<span class="kw">byte</span>) <span class="nu">0</span>);
+
+        <span class="kw">return new</span> <span class="ty">EncryptedPayload</span>(encryptedData, encryptedKey);
+        <span class="cm">// Store both encryptedData and encryptedKey — NEVER the plaintext key</span>
+    }
+
+    <span class="kw">public</span> <span class="ty">String</span> <span class="nm">decrypt</span>(<span class="ty">EncryptedPayload</span> payload) <span class="kw">throws</span> <span class="ty">Exception</span> {
+        <span class="cm">// Step 1: Decrypt the data key using KMS</span>
+        <span class="ty">DecryptResponse</span> decryptedKey = kmsClient.decrypt(r -> r
+            .ciphertextBlob(<span class="ty">SdkBytes</span>.fromByteArray(payload.getEncryptedKey())));
+
+        <span class="kw">byte</span>[] plaintextKey = decryptedKey.plaintext().asByteArray();
+
+        <span class="cm">// Step 2: Decrypt data locally</span>
+        <span class="kw">byte</span>[] decryptedData = aesDecrypt(payload.getEncryptedData(), plaintextKey);
+        <span class="ty">Arrays</span>.fill(plaintextKey, (<span class="kw">byte</span>) <span class="nu">0</span>); <span class="cm">// clear from memory</span>
+
+        <span class="kw">return new</span> <span class="ty">String</span>(decryptedData);
+    }
+}
+
+<span class="cm">// Secrets Manager — cache credentials, don't call on every request</span>
+<span class="an">@Component</span>
+<span class="kw">public class</span> <span class="ty">SecretProvider</span> {
+
+    <span class="kw">private final</span> <span class="ty">SecretsManagerClient</span> secretsClient = <span class="ty">SecretsManagerClient</span>.create();
+    <span class="kw">private final</span> <span class="ty">Map</span>&lt;<span class="ty">String</span>, <span class="ty">String</span>&gt; cache = <span class="kw">new</span> <span class="ty">ConcurrentHashMap</span>&lt;&gt;();
+
+    <span class="kw">public</span> <span class="ty">String</span> <span class="nm">getSecret</span>(<span class="ty">String</span> secretName) {
+        <span class="kw">return</span> cache.computeIfAbsent(secretName, name -> {
+            <span class="ty">GetSecretValueResponse</span> response = secretsClient.getSecretValue(r -> r
+                .secretId(name));
+            <span class="kw">return</span> response.secretString();
+        });
+    }
+}</code></pre>
+
+            <div class="exam-box">
+                <h4>🎓 Exam Insights</h4>
+                <ul>
+                    <li>KMS auto-rotation: symmetric CMKs only — not asymmetric, not imported keys</li>
+                    <li>Secrets Manager: auto-rotation built-in (RDS, Redshift, etc.)</li>
+                    <li>SSM Parameter Store: no auto-rotation (use Lambda for custom rotation)</li>
+                    <li>Envelope encryption: KMS encrypts data key, data key encrypts data</li>
+                    <li>Never store plaintext data key — only the encrypted version</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== LAB 17 ===== -->
+    <div class="lab" id="jlab17">
+        <div class="lab-header" onclick="toggle(this)">
+            <span class="lab-num">Lab 17</span>
+            <span class="lab-title">Spring Boot on ECS Fargate — Dockerfile & Task Definition</span>
+            <div style="display:flex;gap:6px"><span class="tag spring">Spring Boot</span><span class="tag teal">ECS</span><span class="tag blue">Fargate</span></div>
+            <span class="chevron">▼</span>
+        </div>
+        <div class="lab-body">
+            <h3>🐳 Dockerfile for Spring Boot</h3>
+            <pre><code># Multi-stage build — smaller final image
+FROM eclipse-temurin:17-jdk-alpine AS builder
+WORKDIR /app
+COPY pom.xml .
+COPY src ./src
+RUN ./mvnw clean package -DskipTests
+
+# Runtime stage — only JRE, no build tools
+FROM eclipse-temurin:17-jre-alpine
+WORKDIR /app
+
+# Create non-root user for security
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+USER appuser
+
+COPY --from=builder /app/target/*.jar app.jar
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=60s \
+  CMD wget -q -O- http://localhost:8080/actuator/health || exit 1
+
+EXPOSE 8080
+ENTRYPOINT ["java", \
+  "-XX:+UseContainerSupport", \
+  "-XX:MaxRAMPercentage=75.0", \
+  "-jar", "app.jar"]</code></pre>
+
+            <h3>☕ Spring Boot Health Check (for ECS)</h3>
+            <pre><code><span class="cm">// application.properties</span>
+management.endpoints.web.exposure.include=health,info,metrics
+management.endpoint.health.show-details=when-authorized
+management.health.db.enabled=true
+management.health.redis.enabled=true
+
+<span class="cm">// Custom health indicator</span>
+<span class="an">@Component</span>
+<span class="kw">public class</span> <span class="ty">DynamoDbHealthIndicator</span> <span class="kw">implements</span> <span class="ty">HealthIndicator</span> {
+
+    <span class="kw">private final</span> <span class="ty">DynamoDbClient</span> dynamoDb;
+
+    <span class="an">@Override</span>
+    <span class="kw">public</span> <span class="ty">Health</span> <span class="nm">health</span>() {
+        <span class="kw">try</span> {
+            dynamoDb.listTables(r -> r.limit(<span class="nu">1</span>));
+            <span class="kw">return</span> <span class="ty">Health</span>.up().withDetail(<span class="st">"dynamodb"</span>, <span class="st">"available"</span>).build();
+        } <span class="kw">catch</span> (<span class="ty">Exception</span> e) {
+            <span class="kw">return</span> <span class="ty">Health</span>.down().withException(e).build();
+        }
+    }
+}</code></pre>
+
+            <div class="steps">
+                <div class="step"><strong>Build and push to ECR</strong>
+                    <pre><code>mvn clean package -DskipTests
+docker build -t myapp:latest .
+aws ecr get-login-password --region us-east-1 | \
+  docker login --username AWS --password-stdin ACCOUNT.dkr.ecr.us-east-1.amazonaws.com
+docker tag myapp:latest ACCOUNT.dkr.ecr.us-east-1.amazonaws.com/myapp:latest
+docker push ACCOUNT.dkr.ecr.us-east-1.amazonaws.com/myapp:latest</code></pre>
+                </div>
+            </div>
+
+            <div class="exam-box">
+                <h4>🎓 Exam Insights</h4>
+                <ul>
+                    <li>Fargate MUST use <code>awsvpc</code> network mode — each task gets own ENI</li>
+                    <li>Task Role = your app's AWS permissions; Execution Role = Fargate infrastructure</li>
+                    <li>Services auto-recover failed tasks; standalone tasks do not</li>
+                    <li>Use <code>-XX:+UseContainerSupport</code> so JVM respects container memory limits</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== LAB 18 ===== -->
+    <div class="lab" id="jlab18">
+        <div class="lab-header" onclick="toggle(this)">
+            <span class="lab-num">Lab 18</span>
+            <span class="lab-title">CodeBuild — buildspec.yml for Java/Maven Projects</span>
+            <div style="display:flex;gap:6px"><span class="tag java">Java</span><span class="tag orange">CodeBuild</span><span class="tag purple">CI/CD</span></div>
+            <span class="chevron">▼</span>
+        </div>
+        <div class="lab-body">
+            <h3>📋 buildspec.yml for Maven + Docker</h3>
+            <pre><code>version: 0.2
+
+env:
+  variables:
+    JAVA_HOME: "/usr/lib/jvm/java-17-amazon-corretto"
+    MAVEN_OPTS: "-Xmx1024m"
+  parameter-store:
+    SONAR_TOKEN: "/myapp/sonar/token"
+    DB_PASSWORD: "/myapp/test/db-password"
+
+phases:
+  install:
+    runtime-versions:
+      java: corretto17
+    commands:
+      - echo "Java version:"
+      - java -version
+
+  pre_build:
+    commands:
+      - echo "Logging in to ECR..."
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION |
+          docker login --username AWS --password-stdin $ECR_REPO
+      - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+      - IMAGE_TAG=${COMMIT_HASH:=latest}
+
+  build:
+    commands:
+      - echo "Running tests..."
+      - mvn clean verify -B
+      - echo "Building Docker image..."
+      - docker build -t $ECR_REPO:$IMAGE_TAG .
+      - docker tag $ECR_REPO:$IMAGE_TAG $ECR_REPO:latest
+
+  post_build:
+    commands:
+      - echo "Pushing image to ECR..."
+      - docker push $ECR_REPO:$IMAGE_TAG
+      - docker push $ECR_REPO:latest
+      - printf '[{"name":"myapp","imageUri":"%s"}]' $ECR_REPO:$IMAGE_TAG > imagedefinitions.json
+
+artifacts:
+  files:
+    - imagedefinitions.json
+    - appspec.yml
+    - taskdef.json
+
+cache:
+  paths:
+    - /root/.m2/**/*    # Cache Maven dependencies between builds</code></pre>
+
+            <div class="tip spring"><strong>Maven cache:</strong> Caching <code>/root/.m2</code> in S3 dramatically speeds up builds by avoiding re-downloading all dependencies on every build.</div>
+            <div class="tip red"><strong>buildspec.yml must be at the root of your source code.</strong> Use SSM Parameter Store for secrets — never plaintext env vars for sensitive data.</div>
+
+            <div class="exam-box">
+                <h4>🎓 Exam Insights</h4>
+                <ul>
+                    <li>CodeBuild uses Docker under the hood — can use custom Docker images</li>
+                    <li>Artifacts encrypted with KMS and stored in S3</li>
+                    <li>Cache section saves Maven/Gradle deps to S3 between builds</li>
+                    <li>Local debugging: install Docker + CodeBuild Agent</li>
+                    <li>Phases: install → pre_build → build → post_build</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+</main>
+
+<script>
+    function toggle(header) {
+        const lab = header.parentElement;
+        lab.classList.toggle('open');
+    }
+    const sections = document.querySelectorAll('.lab[id]');
+    const navLinks = document.querySelectorAll('nav a');
+    window.addEventListener('scroll', () => {
+        let current = '';
+        sections.forEach(s => { if (window.scrollY >= s.offsetTop - 80) current = s.id; });
+        navLinks.forEach(a => { a.classList.toggle('active', a.getAttribute('href') === '#' + current); });
+    });
+    window.addEventListener('load', () => {
+        if (location.hash) {
+            const t = document.querySelector(location.hash);
+            if (t) t.classList.add('open');
+        }
+    });
+</script>
+</body>
+</html>
